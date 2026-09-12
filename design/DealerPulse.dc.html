@@ -1,0 +1,2117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:oklch(0.165 0.006 75);color:oklch(0.965 0.004 85);font-family:'Instrument Sans',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+a{color:oklch(0.79 0.10 200);text-decoration:none}
+a:hover{color:oklch(0.88 0.08 200)}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid oklch(0.79 0.10 200);outline-offset:2px;border-radius:3px}
+::selection{background:oklch(0.34 0.05 200)}
+@keyframes dpShim{0%{opacity:.35}50%{opacity:.7}100%{opacity:.35}}
+@keyframes dpIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes dpSpin{to{transform:rotate(360deg)}}
+</style>
+</helmet>
+<div style="display:flex;min-height:100vh;background:oklch(0.165 0.006 75)">
+
+  <aside style="flex:none;width:{{ ui.railW }};position:sticky;top:0;height:100vh;display:flex;flex-direction:column;background:oklch(0.192 0.006 75);border-right:1px solid oklch(0.285 0.008 75)">
+    <div style="display:flex;align-items:center;gap:10px;padding:20px 18px 22px">
+      <div style="flex:none;width:22px;height:22px;border-radius:6px;background:oklch(0.79 0.10 200);display:flex;align-items:center;justify-content:center">
+        <div style="width:7px;height:7px;background:oklch(0.192 0.006 75);transform:rotate(45deg)"></div>
+      </div>
+      <sc-if value="{{ ui.wide }}" hint-placeholder-val="{{ true }}">
+        <div style="font-size:15px;font-weight:600;letter-spacing:-0.01em">DealerPulse</div>
+      </sc-if>
+    </div>
+    <nav aria-label="Primary" style="display:flex;flex-direction:column;gap:2px;padding:0 10px">
+      <sc-for list="{{ nav }}" as="item" hint-placeholder-count="4">
+        <button type="button" onClick="{{ item.onClick }}" aria-current="{{ item.current }}" title="{{ item.label }}" style="display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 10px;border:0;border-radius:7px;cursor:pointer;background:{{ item.bg }};color:{{ item.fg }};font-size:13.5px;font-weight:500" style-hover="background:oklch(0.245 0.008 75)">
+          <span style="flex:none;width:16px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.02em;color:{{ item.markFg }}">{{ item.mark }}</span>
+          <sc-if value="{{ ui.wide }}" hint-placeholder-val="{{ true }}"><span>{{ item.label }}</span></sc-if>
+        </button>
+      </sc-for>
+    </nav>
+    <div style="flex:1"></div>
+    <sc-if value="{{ ui.wide }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:16px 18px;border-top:1px solid oklch(0.285 0.008 75);font-size:11px;line-height:1.6;color:oklch(0.58 0.008 80)">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.08em;color:oklch(0.52 0.008 80);margin-bottom:6px">DATASET</div>
+        <div>{{ meta.scope }}</div>
+        <div>{{ meta.rangeText }}</div>
+      </div>
+    </sc-if>
+    <button type="button" onClick="{{ ui.onToggleRail }}" style="margin:10px;padding:7px;border:1px solid oklch(0.285 0.008 75);border-radius:7px;background:transparent;cursor:pointer;color:oklch(0.62 0.008 80);font-size:11px" style-hover="color:oklch(0.9 0.004 85);border-color:oklch(0.38 0.008 75)">{{ ui.railToggle }}</button>
+  </aside>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+    <header style="position:sticky;top:0;z-index:30;display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 24px;background:oklch(0.178 0.006 75 / 0.92);backdrop-filter:blur(8px);border-bottom:1px solid oklch(0.285 0.008 75)">
+      <div style="min-width:180px;flex:1">
+        <div style="font-size:15px;font-weight:600;letter-spacing:-0.01em">{{ head.title }}</div>
+        <div style="font-size:11.5px;color:oklch(0.62 0.008 80);margin-top:2px">{{ head.subtitle }}</div>
+      </div>
+      <button type="button" onClick="{{ ask.onOpen }}" style="display:flex;align-items:center;gap:8px;min-width:210px;padding:7px 10px 7px 9px;border:1px solid oklch(0.34 0.03 200);border-radius:8px;background:oklch(0.215 0.012 200);cursor:pointer;color:oklch(0.72 0.008 80);font-size:12.5px;text-align:left" style-hover="border-color:oklch(0.5 0.06 200);color:oklch(0.92 0.004 85)">
+        <span style="flex:none;width:12px;height:12px;background:oklch(0.79 0.10 200);transform:rotate(45deg);border-radius:2px"></span>
+        <span style="flex:1">Ask DealerPulse…</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:oklch(0.55 0.008 80);border:1px solid oklch(0.32 0.008 75);border-radius:4px;padding:1px 4px">/</span>
+      </button>
+      <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:oklch(0.6 0.008 80)">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.06em">RANGE</span>
+        <select value="{{ head.range }}" onChange="{{ head.onRange }}" aria-label="Date range" style="padding:6px 8px;border:1px solid oklch(0.30 0.008 75);border-radius:7px;background:oklch(0.215 0.006 75);color:oklch(0.92 0.004 85);font-size:12px">
+          <sc-for list="{{ head.ranges }}" as="opt" hint-placeholder-count="4"><option value="{{ opt.value }}">{{ opt.label }}</option></sc-for>
+        </select>
+      </label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:oklch(0.6 0.008 80)">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.06em">BRANCH</span>
+        <select value="{{ head.branch }}" onChange="{{ head.onBranch }}" aria-label="Branch filter" style="padding:6px 8px;border:1px solid oklch(0.30 0.008 75);border-radius:7px;background:oklch(0.215 0.006 75);color:oklch(0.92 0.004 85);font-size:12px">
+          <sc-for list="{{ head.branches }}" as="opt" hint-placeholder-count="6"><option value="{{ opt.value }}">{{ opt.label }}</option></sc-for>
+        </select>
+      </label>
+      <div style="display:flex;align-items:center;gap:7px;padding:6px 10px;border:1px solid oklch(0.30 0.008 75);border-radius:7px;background:oklch(0.205 0.006 75)">
+        <span style="width:6px;height:6px;border-radius:50%;background:oklch(0.75 0.13 152)"></span>
+        <span style="font-size:11.5px;color:oklch(0.72 0.008 80);white-space:nowrap">Data as of {{ meta.asOf }}</span>
+      </div>
+    </header>
+
+    <main style="flex:1;padding:24px;max-width:1560px;width:100%">
+
+      <sc-if value="{{ state.loading }}" hint-placeholder-val="{{ true }}">
+        <div aria-busy="true" aria-live="polite" style="display:flex;flex-direction:column;gap:16px">
+          <div style="height:132px;border-radius:10px;background:oklch(0.215 0.006 75);border:1px solid oklch(0.285 0.008 75);animation:dpShim 1.4s ease-in-out infinite"></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px">
+            <sc-for list="{{ state.skeleton }}" as="s" hint-placeholder-count="4">
+              <div style="height:104px;border-radius:10px;background:oklch(0.215 0.006 75);border:1px solid oklch(0.285 0.008 75);animation:dpShim 1.4s ease-in-out infinite"></div>
+            </sc-for>
+          </div>
+          <div style="height:280px;border-radius:10px;background:oklch(0.215 0.006 75);border:1px solid oklch(0.285 0.008 75);animation:dpShim 1.4s ease-in-out infinite"></div>
+          <div style="font-size:12px;color:oklch(0.58 0.008 80)">Loading dealership dataset…</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ state.error }}" hint-placeholder-val="{{ false }}">
+        <div role="alert" style="max-width:520px;margin:64px auto;text-align:center;padding:28px;border:1px solid oklch(0.42 0.09 27);border-radius:10px;background:oklch(0.22 0.03 27)">
+          <div style="width:26px;height:26px;margin:0 auto 14px;border-radius:50%;border:2px solid oklch(0.66 0.17 27)"></div>
+          <div style="font-size:15px;font-weight:600;margin-bottom:6px">Could not load the dataset</div>
+          <div style="font-size:12.5px;line-height:1.6;color:oklch(0.74 0.008 80)">{{ state.error }}</div>
+          <button type="button" onClick="{{ state.onRetry }}" style="margin-top:16px;padding:8px 14px;border:1px solid oklch(0.4 0.008 75);border-radius:7px;background:oklch(0.25 0.006 75);cursor:pointer;font-size:12.5px">Retry</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ show.overview }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Overview" style="display:flex;flex-direction:column;gap:18px;animation:dpIn .28s ease-out">
+
+          <section aria-label="AI executive brief" style="border:1px solid oklch(0.34 0.03 200);border-radius:12px;background:linear-gradient(180deg,oklch(0.225 0.016 200),oklch(0.205 0.008 200));padding:20px 22px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+              <span style="width:11px;height:11px;background:oklch(0.79 0.10 200);transform:rotate(45deg);border-radius:2px"></span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;color:oklch(0.79 0.10 200)">AI EXECUTIVE BRIEF</span>
+              <span style="font-size:10.5px;color:oklch(0.56 0.008 80)">· computed from the dataset, {{ meta.rangeText }}</span>
+            </div>
+            <p style="margin:0 0 16px;font-size:19px;line-height:1.45;font-weight:500;letter-spacing:-0.01em;max-width:78ch;text-wrap:pretty">{{ ov.brief.headline }}</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-bottom:16px">
+              <sc-for list="{{ ov.brief.findings }}" as="f" hint-placeholder-count="3">
+                <button type="button" onClick="{{ f.onClick }}" style="text-align:left;padding:12px 13px;border:1px solid oklch(0.30 0.008 75);border-radius:9px;background:oklch(0.195 0.006 75);cursor:pointer" style-hover="border-color:oklch(0.45 0.04 200);background:oklch(0.215 0.008 75)">
+                  <div style="display:flex;align-items:center;gap:6px;margin-bottom:7px">
+                    <span style="width:5px;height:5px;border-radius:50%;background:{{ f.dot }}"></span>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.08em;color:oklch(0.6 0.008 80)">{{ f.tag }}</span>
+                  </div>
+                  <div style="font-size:12.5px;line-height:1.55;color:oklch(0.86 0.006 82);text-wrap:pretty">{{ f.text }}</div>
+                </button>
+              </sc-for>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding-top:14px;border-top:1px solid oklch(0.30 0.012 200)">
+              <div style="flex:1;min-width:240px;font-size:12.5px;line-height:1.5;color:oklch(0.8 0.006 82)"><span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.08em;color:oklch(0.6 0.008 80)">DO NEXT&nbsp;&nbsp;</span>{{ ov.brief.action }}</div>
+              <button type="button" onClick="{{ ov.brief.onProblem }}" style="padding:8px 13px;border:1px solid oklch(0.36 0.008 75);border-radius:7px;background:oklch(0.235 0.006 75);cursor:pointer;font-size:12.5px;font-weight:500" style-hover="border-color:oklch(0.5 0.008 75)">{{ ov.brief.problemLabel }}</button>
+              <button type="button" onClick="{{ ov.brief.onAction }}" style="padding:8px 13px;border:1px solid oklch(0.79 0.10 200);border-radius:7px;background:oklch(0.79 0.10 200);color:oklch(0.17 0.02 200);cursor:pointer;font-size:12.5px;font-weight:600" style-hover="background:oklch(0.86 0.09 200)">View actions</button>
+            </div>
+          </section>
+
+          <section aria-label="Key metrics" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:14px">
+            <sc-for list="{{ ov.kpis }}" as="k" hint-placeholder-count="4">
+              <div style="position:relative;padding:15px 16px 14px;border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75)">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+                  <span style="font-size:11.5px;font-weight:500;color:oklch(0.68 0.008 80);letter-spacing:0.01em">{{ k.label }}</span>
+                  <button type="button" onClick="{{ k.onWhy }}" aria-label="{{ k.whyAria }}" style="flex:none;padding:2px 7px;border:1px solid oklch(0.33 0.02 200);border-radius:20px;background:transparent;cursor:pointer;font-size:10px;color:oklch(0.72 0.06 200)" style-hover="background:oklch(0.28 0.03 200);color:oklch(0.9 0.05 200)">Why?</button>
+                </div>
+                <div style="display:flex;align-items:baseline;gap:8px;margin:9px 0 0">
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:27px;font-weight:500;letter-spacing:-0.02em;color:{{ k.valueFg }}">{{ k.value }}</span>
+                  <sc-if value="{{ k.delta }}" hint-placeholder-val="{{ false }}">
+                    <span style="font-size:11.5px;font-weight:600;color:{{ k.deltaFg }}">{{ k.delta }}</span>
+                  </sc-if>
+                </div>
+                <div style="margin-top:7px;font-size:11px;line-height:1.5;color:oklch(0.6 0.008 80);text-wrap:pretty">{{ k.sub }}</div>
+              </div>
+            </sc-for>
+          </section>
+
+          <section aria-label="Monthly performance" style="border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);padding:18px 20px 14px">
+            <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;margin-bottom:4px">
+              <h2 style="margin:0;font-size:13.5px;font-weight:600;letter-spacing:-0.005em">Monthly performance</h2>
+              <span style="font-size:11px;color:oklch(0.58 0.008 80)">Units delivered and revenue by delivery month</span>
+              <div style="flex:1"></div>
+              <div style="display:flex;align-items:center;gap:14px;font-size:10.5px;color:oklch(0.66 0.008 80)">
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:2px;background:oklch(0.52 0.055 200)"></span>Units</span>
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:oklch(0.79 0.10 200)"></span>Revenue</span>
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:2px;border-top:2px dashed oklch(0.55 0.008 80)"></span>Target</span>
+              </div>
+            </div>
+            <div style="position:relative;display:flex;align-items:flex-end;gap:10px;height:210px;padding:22px 0 0">
+              <div style="position:absolute;inset:22px 0 0;pointer-events:none">{{ ov.trend.line }}</div>
+              <sc-for list="{{ ov.trend.rows }}" as="m" hint-placeholder-count="7">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;height:100%;position:relative">
+                  <div style="position:absolute;left:0;right:0;bottom:{{ m.revPct }};display:flex;justify-content:center;pointer-events:none">
+                    <span style="width:7px;height:7px;border-radius:50%;background:oklch(0.165 0.006 75);border:2px solid oklch(0.79 0.10 200);margin-bottom:-3px"></span>
+                  </div>
+                  <div style="position:absolute;left:0;right:0;bottom:{{ m.targetPct }};border-top:1px dashed oklch(0.42 0.008 75);pointer-events:none"></div>
+                  <div title="{{ m.tooltip }}" style="height:{{ m.unitsPct }};min-height:3px;border-radius:4px 4px 0 0;background:{{ m.barFill }}"></div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:8px;padding-top:8px;border-top:1px solid oklch(0.27 0.008 75)">
+              <sc-for list="{{ ov.trend.rows }}" as="m" hint-placeholder-count="7">
+                <div style="flex:1;min-width:0;text-align:center">
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:{{ m.labelFg }}">{{ m.units }}</div>
+                  <div style="font-size:10.5px;color:oklch(0.56 0.008 80);margin-top:2px">{{ m.label }}</div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:oklch(0.5 0.008 80);margin-top:1px">{{ m.revText }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section aria-label="Branch performance" style="border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);overflow:hidden">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:16px 20px 14px">
+              <h2 style="margin:0;font-size:13.5px;font-weight:600">Branch performance</h2>
+              <span style="font-size:11px;color:oklch(0.58 0.008 80)">{{ ov.branchNote }}</span>
+              <div style="flex:1"></div>
+              <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:oklch(0.6 0.008 80)">Sort
+                <select value="{{ ov.sort }}" onChange="{{ ov.onSort }}" aria-label="Sort branches" style="padding:5px 8px;border:1px solid oklch(0.30 0.008 75);border-radius:6px;background:oklch(0.19 0.006 75);font-size:11.5px">
+                  <sc-for list="{{ ov.sortOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+                </select>
+              </label>
+            </div>
+            <div style="overflow-x:auto">
+              <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:940px">
+                <thead>
+                  <tr style="background:oklch(0.192 0.006 75)">
+                    <th scope="col" style="position:sticky;left:0;z-index:2;background:oklch(0.192 0.006 75);text-align:left;padding:9px 20px;font-size:10px;font-weight:600;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-top:1px solid oklch(0.27 0.008 75);border-bottom:1px solid oklch(0.27 0.008 75)">BRANCH</th>
+                    <sc-for list="{{ ov.branchCols }}" as="c" hint-placeholder-count="8">
+                      <th scope="col" title="{{ c.hint }}" style="text-align:right;padding:9px 14px;font-size:10px;font-weight:600;letter-spacing:0.08em;color:oklch(0.6 0.008 80);white-space:nowrap;border-top:1px solid oklch(0.27 0.008 75);border-bottom:1px solid oklch(0.27 0.008 75)">{{ c.label }}</th>
+                    </sc-for>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{ ov.branches }}" as="b" hint-placeholder-count="5">
+                    <tr onClick="{{ b.onClick }}" tabIndex="0" onKeyDown="{{ b.onKey }}" style="cursor:pointer;border-bottom:1px solid oklch(0.25 0.008 75);background:{{ b.rowBg }}" style-hover="background:oklch(0.245 0.008 75)">
+                      <th scope="row" style="position:sticky;left:0;z-index:1;background:{{ b.stickyBg }};text-align:left;padding:12px 20px;font-weight:500">
+                        <div style="display:flex;align-items:center;gap:9px">
+                          <span style="flex:none;width:3px;height:26px;border-radius:2px;background:{{ b.accent }}"></span>
+                          <span>
+                            <span style="display:block;font-size:12.5px;color:oklch(0.95 0.004 85)">{{ b.name }}</span>
+                            <span style="display:block;font-size:10.5px;font-weight:400;color:oklch(0.58 0.008 80);margin-top:1px">{{ b.city }} · {{ b.manager }}</span>
+                          </span>
+                        </div>
+                      </th>
+                      <td style="text-align:right;padding:12px 14px;font-family:'JetBrains Mono',monospace">{{ b.leads }}</td>
+                      <td style="text-align:right;padding:12px 14px;font-family:'JetBrains Mono',monospace;color:{{ b.convFg }}">{{ b.conversion }}</td>
+                      <td style="text-align:right;padding:12px 14px;font-family:'JetBrains Mono',monospace">{{ b.units }}</td>
+                      <td style="text-align:right;padding:12px 14px;font-family:'JetBrains Mono',monospace">{{ b.revenue }}</td>
+                      <td style="text-align:right;padding:12px 14px;font-family:'JetBrains Mono',monospace;color:oklch(0.74 0.008 80)">{{ b.attainment }}<span style="font-size:10px;color:oklch(0.52 0.008 80)"> #{{ b.attainmentRank }}</span></td>
+                      <td style="text-align:right;padding:12px 14px;font-family:'JetBrains Mono',monospace;color:{{ b.riskFg }}">{{ b.risk }}</td>
+                      <td style="text-align:right;padding:12px 14px;white-space:nowrap">
+                        <span style="display:inline-block;padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600;background:{{ b.statusBg }};color:{{ b.statusFg }}">{{ b.statusLabel }}</span>
+                      </td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+            <div style="padding:11px 20px;font-size:11px;color:oklch(0.56 0.008 80);border-top:1px solid oklch(0.27 0.008 75)">{{ ov.branchFoot }}</div>
+          </section>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:18px">
+            <section aria-label="Funnel overview" style="border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);padding:18px 20px">
+              <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:16px">
+                <h2 style="margin:0;font-size:13.5px;font-weight:600">Funnel overview</h2>
+                <span style="font-size:11px;color:oklch(0.58 0.008 80)">{{ ov.funnelNote }}</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:9px">
+                <sc-for list="{{ ov.funnel }}" as="s" hint-placeholder-count="6">
+                  <div>
+                    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:4px">
+                      <span style="font-size:12px;color:oklch(0.86 0.006 82)">{{ s.label }}</span>
+                      <span style="display:flex;align-items:baseline;gap:10px">
+                        <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:oklch(0.9 0.004 85)">{{ s.count }}</span>
+                        <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:{{ s.convFg }};min-width:66px;text-align:right">{{ s.convText }}</span>
+                      </span>
+                    </div>
+                    <div style="height:9px;border-radius:3px;background:oklch(0.245 0.008 75);overflow:hidden">
+                      <div style="height:100%;width:{{ s.width }};border-radius:3px;background:{{ s.fill }}"></div>
+                    </div>
+                    <sc-if value="{{ s.flag }}" hint-placeholder-val="{{ false }}">
+                      <div style="margin-top:5px;font-size:10.5px;color:oklch(0.8 0.12 78)">{{ s.flag }}</div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+              <button type="button" onClick="{{ ov.onFunnel }}" style="margin-top:16px;padding:7px 12px;border:1px solid oklch(0.34 0.008 75);border-radius:7px;background:oklch(0.235 0.006 75);cursor:pointer;font-size:12px" style-hover="border-color:oklch(0.5 0.008 75)">Open funnel diagnostics</button>
+            </section>
+
+            <section aria-label="AI insights" style="border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);padding:18px 20px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+                <span style="width:10px;height:10px;background:oklch(0.79 0.10 200);transform:rotate(45deg);border-radius:2px"></span>
+                <h2 style="margin:0;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;color:oklch(0.79 0.10 200);font-weight:500">AI INSIGHTS</h2>
+                <span style="font-size:10.5px;color:oklch(0.56 0.008 80)">{{ ov.insightNote }}</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ ov.insights }}" as="i" hint-placeholder-count="4">
+                  <div style="border:1px solid oklch(0.29 0.008 75);border-left:2px solid {{ i.sevColor }};border-radius:8px;background:oklch(0.196 0.006 75);overflow:hidden">
+                    <button type="button" onClick="{{ i.onToggle }}" aria-expanded="{{ i.expandedAttr }}" style="display:block;width:100%;text-align:left;padding:12px 14px;border:0;background:transparent;cursor:pointer">
+                      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                        <span style="padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.08em;font-weight:600;background:{{ i.sevBg }};color:{{ i.sevFg }}">{{ i.sevLabel }}</span>
+                        <span style="font-size:10.5px;color:oklch(0.56 0.008 80)">{{ i.type }}</span>
+                        <div style="flex:1"></div>
+                        <span style="font-size:14px;color:oklch(0.6 0.008 80)">{{ i.chevron }}</span>
+                      </div>
+                      <div style="font-size:12.5px;line-height:1.5;font-weight:500;color:oklch(0.93 0.004 85);text-wrap:pretty">{{ i.title }}</div>
+                    </button>
+                    <sc-if value="{{ i.expanded }}" hint-placeholder-val="{{ false }}">
+                      <div style="padding:0 14px 13px">
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;padding:11px 12px;border-radius:7px;background:oklch(0.175 0.006 75);margin-bottom:11px">
+                          <sc-for list="{{ i.evidence }}" as="e" hint-placeholder-count="4">
+                            <div>
+                              <div style="font-size:10px;color:oklch(0.58 0.008 80);margin-bottom:3px">{{ e.label }}</div>
+                              <div style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:oklch(0.93 0.004 85)">{{ e.value }}</div>
+                              <div style="font-size:9.5px;color:oklch(0.52 0.008 80);margin-top:2px">{{ e.note }}</div>
+                            </div>
+                          </sc-for>
+                        </div>
+                        <div style="font-size:12px;line-height:1.6;color:oklch(0.8 0.006 82);margin-bottom:9px;text-wrap:pretty">{{ i.explanation }}</div>
+                        <div style="font-size:11.5px;line-height:1.55;color:oklch(0.68 0.008 80);margin-bottom:12px;text-wrap:pretty"><span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.08em;color:oklch(0.56 0.008 80)">IMPACT&nbsp;&nbsp;</span>{{ i.impact }}</div>
+                        <button type="button" onClick="{{ i.onCta }}" style="padding:7px 12px;border:1px solid oklch(0.36 0.03 200);border-radius:7px;background:oklch(0.24 0.02 200);cursor:pointer;font-size:12px;color:oklch(0.88 0.05 200)" style-hover="border-color:oklch(0.55 0.07 200)">{{ i.ctaLabel }}</button>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </section>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ show.branches }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Branches" style="display:flex;flex-direction:column;gap:18px;animation:dpIn .28s ease-out">
+          <section aria-label="Network baseline" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px">
+            <sc-for list="{{ list.baseline }}" as="s" hint-placeholder-count="4">
+              <div style="padding:14px 16px;border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75)">
+                <div style="font-size:11.5px;color:oklch(0.66 0.008 80)">{{ s.label }}</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:22px;margin-top:6px">{{ s.value }}</div>
+              </div>
+            </sc-for>
+          </section>
+          <section aria-label="Branch ranking" style="border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);padding:18px 20px">
+            <h2 style="margin:0 0 4px;font-size:13.5px;font-weight:600">Conversion against network baseline</h2>
+            <p style="margin:0 0 18px;font-size:11.5px;line-height:1.5;color:oklch(0.6 0.008 80);max-width:70ch">{{ list.note }}</p>
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <sc-for list="{{ list.rows }}" as="b" hint-placeholder-count="5">
+                <button type="button" onClick="{{ b.onClick }}" style="display:block;width:100%;text-align:left;padding:14px 15px;border:1px solid oklch(0.29 0.008 75);border-left:3px solid {{ b.accent }};border-radius:9px;background:oklch(0.196 0.006 75);cursor:pointer" style-hover="background:oklch(0.225 0.008 75);border-color:oklch(0.42 0.008 75)">
+                  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px">
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:oklch(0.56 0.008 80)">#{{ b.rank }}</span>
+                    <span style="font-size:13.5px;font-weight:600">{{ b.name }}</span>
+                    <span style="font-size:11.5px;color:oklch(0.6 0.008 80)">{{ b.city }} · {{ b.manager }}</span>
+                    <span style="padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:600;background:{{ b.statusBg }};color:{{ b.statusFg }}">{{ b.statusLabel }}</span>
+                    <div style="flex:1"></div>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:17px">{{ b.conversion }}</span>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:{{ b.vsNetFg }}">{{ b.vsNet }}</span>
+                  </div>
+                  <div style="position:relative;height:10px;border-radius:3px;background:oklch(0.25 0.008 75);margin-bottom:11px">
+                    <div style="height:100%;width:{{ b.convBar }};border-radius:3px;background:{{ b.convFill }}"></div>
+                    <div style="position:absolute;top:-3px;bottom:-3px;left:{{ b.netBar }};width:1px;background:oklch(0.85 0.006 82)" title="Network baseline"></div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;font-size:11px">
+                    <span style="color:oklch(0.6 0.008 80)">Leads <span style="font-family:'JetBrains Mono',monospace;color:oklch(0.9 0.004 85)">{{ b.leads }}</span></span>
+                    <span style="color:oklch(0.6 0.008 80)">Units <span style="font-family:'JetBrains Mono',monospace;color:oklch(0.9 0.004 85)">{{ b.units }}</span></span>
+                    <span style="color:oklch(0.6 0.008 80)">Revenue <span style="font-family:'JetBrains Mono',monospace;color:oklch(0.9 0.004 85)">{{ b.revenue }}</span></span>
+                    <span style="color:oklch(0.6 0.008 80)">Pipeline <span style="font-family:'JetBrains Mono',monospace;color:oklch(0.9 0.004 85)">{{ b.pipeline }}</span></span>
+                    <span style="color:oklch(0.6 0.008 80)">Stale <span style="font-family:'JetBrains Mono',monospace;color:oklch(0.9 0.004 85)">{{ b.stale }}</span></span>
+                    <span style="color:oklch(0.6 0.008 80)">Target <span style="font-family:'JetBrains Mono',monospace;color:oklch(0.9 0.004 85)">{{ b.attainment }}</span></span>
+                    <span style="color:oklch(0.6 0.008 80)">Delay rate <span style="font-family:'JetBrains Mono',monospace;color:oklch(0.9 0.004 85)">{{ b.delay }}</span></span>
+                  </div>
+                  <div style="margin-top:9px;font-size:11px;color:oklch(0.62 0.008 80)"><span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.08em;color:oklch(0.54 0.008 80)">BIGGEST LEAK&nbsp;&nbsp;</span>{{ b.leak }}</div>
+                </button>
+              </sc-for>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ show.branch }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Branch Detail" style="display:flex;flex-direction:column;gap:18px;animation:dpIn .28s ease-out">
+          <sc-if value="{{ br.missing }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:40px;text-align:center;border:1px solid oklch(0.30 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75)">
+              <div style="font-size:14px;font-weight:600;margin-bottom:6px">Branch not found</div>
+              <div style="font-size:12px;color:oklch(0.66 0.008 80);margin-bottom:14px">That branch id is not in the dataset.</div>
+              <button type="button" onClick="{{ br.onBack }}" style="padding:8px 14px;border:1px solid oklch(0.38 0.008 75);border-radius:7px;background:oklch(0.25 0.006 75);cursor:pointer;font-size:12.5px">All branches</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ br.header.name }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:15px 18px;border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75)">
+              <button type="button" onClick="{{ br.header.onBack }}" style="padding:5px 10px;border:1px solid oklch(0.32 0.008 75);border-radius:6px;background:transparent;cursor:pointer;font-size:11.5px;color:oklch(0.72 0.008 80)" style-hover="color:oklch(0.95 0.004 85)">‹ Branches</button>
+              <div>
+                <div style="font-size:17px;font-weight:600;letter-spacing:-0.01em">{{ br.header.name }}</div>
+                <div style="font-size:11.5px;color:oklch(0.62 0.008 80);margin-top:2px">{{ br.header.city }} · Manager {{ br.header.manager }} · {{ br.header.rank }}</div>
+              </div>
+              <div style="flex:1"></div>
+              <span style="padding:4px 11px;border-radius:20px;font-size:11.5px;font-weight:600;background:{{ br.header.statusBg }};color:{{ br.header.statusFg }}">{{ br.header.statusLabel }}</span>
+              <span style="font-size:11.5px;color:oklch(0.62 0.008 80)">{{ br.header.range }}</span>
+            </div>
+
+            <section aria-label="Branch metrics" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:13px">
+              <sc-for list="{{ br.kpis }}" as="k" hint-placeholder-count="7">
+                <div style="padding:14px 15px;border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75)">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:6px">
+                    <span style="font-size:11.5px;color:oklch(0.68 0.008 80)">{{ k.label }}</span>
+                    <sc-if value="{{ k.hasWhy }}" hint-placeholder-val="{{ false }}">
+                      <button type="button" onClick="{{ k.onWhy }}" aria-label="{{ k.whyAria }}" style="flex:none;padding:2px 7px;border:1px solid oklch(0.33 0.02 200);border-radius:20px;background:transparent;cursor:pointer;font-size:10px;color:oklch(0.72 0.06 200)" style-hover="background:oklch(0.28 0.03 200)">Why?</button>
+                    </sc-if>
+                  </div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:23px;margin-top:8px;color:{{ k.valueFg }}">{{ k.value }}</div>
+                  <div style="margin-top:6px;font-size:10.5px;line-height:1.5;color:oklch(0.6 0.008 80)">{{ k.sub }}</div>
+                </div>
+              </sc-for>
+            </section>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:18px">
+              <section aria-label="Performance versus network" style="border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);padding:18px 20px">
+                <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:16px">
+                  <h2 style="margin:0;font-size:13.5px;font-weight:600">Performance vs network</h2>
+                  <span style="font-size:11px;color:oklch(0.58 0.008 80)">white marker = network average</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:13px">
+                  <sc-for list="{{ br.cmpRows }}" as="c" hint-placeholder-count="6">
+                    <div>
+                      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:5px">
+                        <span style="font-size:12px;color:oklch(0.84 0.006 82)">{{ c.label }}</span>
+                        <span style="display:flex;align-items:baseline;gap:9px">
+                          <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">{{ c.value }}</span>
+                          <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:{{ c.diffFg }};min-width:62px;text-align:right">{{ c.diff }}</span>
+                        </span>
+                      </div>
+                      <div style="position:relative;height:8px;border-radius:3px;background:oklch(0.25 0.008 75)">
+                        <div style="height:100%;width:{{ c.bar }};border-radius:3px;background:{{ c.fill }}"></div>
+                        <div style="position:absolute;top:-3px;bottom:-3px;left:{{ c.netMark }};width:1px;background:oklch(0.85 0.006 82)"></div>
+                      </div>
+                      <div style="margin-top:3px;font-size:10px;color:oklch(0.54 0.008 80)">network {{ c.network }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </section>
+
+              <section aria-label="Branch funnel" style="border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);padding:18px 20px">
+                <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:16px">
+                  <h2 style="margin:0;font-size:13.5px;font-weight:600">Branch funnel</h2>
+                  <span style="font-size:11px;color:oklch(0.58 0.008 80)">thin bar = network shape</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:11px">
+                  <sc-for list="{{ br.funnelRows }}" as="s" hint-placeholder-count="6">
+                    <div>
+                      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:4px">
+                        <span style="font-size:12px;color:oklch(0.84 0.006 82)">{{ s.label }}</span>
+                        <span style="display:flex;align-items:baseline;gap:9px;font-family:'JetBrains Mono',monospace">
+                          <span style="font-size:12px">{{ s.count }}</span>
+                          <span style="font-size:10.5px;color:oklch(0.68 0.008 80);min-width:82px;text-align:right">{{ s.conv }} · {{ s.median }}</span>
+                        </span>
+                      </div>
+                      <div style="height:9px;border-radius:3px;background:oklch(0.25 0.008 75);overflow:hidden">
+                        <div style="height:100%;width:{{ s.width }};border-radius:3px;background:{{ s.fill }}"></div>
+                      </div>
+                      <div style="height:3px;margin-top:2px;border-radius:2px;background:oklch(0.25 0.008 75);overflow:hidden">
+                        <div style="height:100%;width:{{ s.netWidth }};background:oklch(0.48 0.008 75)"></div>
+                      </div>
+                      <sc-if value="{{ s.flag }}" hint-placeholder-val="{{ false }}">
+                        <div style="margin-top:5px;font-size:10.5px;color:oklch(0.82 0.12 27)">{{ s.flag }}</div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </section>
+            </div>
+
+            <section aria-label="Rep performance" style="border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);overflow:hidden">
+              <div style="display:flex;align-items:baseline;gap:10px;padding:16px 20px 12px">
+                <h2 style="margin:0;font-size:13.5px;font-weight:600">Rep performance</h2>
+                <span style="font-size:11px;color:oklch(0.58 0.008 80)">Click a rep for their scorecard</span>
+              </div>
+              <sc-if value="{{ br.repEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:0 20px 20px;font-size:12px;color:oklch(0.62 0.008 80)">{{ br.repEmpty }}</div>
+              </sc-if>
+              <div style="overflow-x:auto">
+                <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:820px">
+                  <thead>
+                    <tr style="background:oklch(0.192 0.006 75)">
+                      <th scope="col" style="position:sticky;left:0;z-index:2;background:oklch(0.192 0.006 75);text-align:left;padding:9px 20px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-top:1px solid oklch(0.27 0.008 75);border-bottom:1px solid oklch(0.27 0.008 75)">REP</th>
+                      <th scope="col" style="text-align:right;padding:9px 14px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-top:1px solid oklch(0.27 0.008 75);border-bottom:1px solid oklch(0.27 0.008 75)">LEADS</th>
+                      <th scope="col" style="text-align:right;padding:9px 14px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-top:1px solid oklch(0.27 0.008 75);border-bottom:1px solid oklch(0.27 0.008 75)">CONVERSION</th>
+                      <th scope="col" style="text-align:right;padding:9px 14px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-top:1px solid oklch(0.27 0.008 75);border-bottom:1px solid oklch(0.27 0.008 75)">ORDERS</th>
+                      <th scope="col" style="text-align:right;padding:9px 14px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-top:1px solid oklch(0.27 0.008 75);border-bottom:1px solid oklch(0.27 0.008 75)">DELIVERED</th>
+                      <th scope="col" style="text-align:right;padding:9px 14px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-top:1px solid oklch(0.27 0.008 75);border-bottom:1px solid oklch(0.27 0.008 75)">PIPELINE</th>
+                      <th scope="col" style="text-align:right;padding:9px 14px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-top:1px solid oklch(0.27 0.008 75);border-bottom:1px solid oklch(0.27 0.008 75)">STALE</th>
+                      <th scope="col" style="text-align:right;padding:9px 20px 9px 14px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-top:1px solid oklch(0.27 0.008 75);border-bottom:1px solid oklch(0.27 0.008 75)">RANK</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <sc-for list="{{ br.reps }}" as="r" hint-placeholder-count="6">
+                      <tr onClick="{{ r.onClick }}" tabIndex="0" style="cursor:pointer;border-bottom:1px solid oklch(0.25 0.008 75)" style-hover="background:oklch(0.245 0.008 75)">
+                        <th scope="row" style="position:sticky;left:0;z-index:1;background:oklch(0.212 0.006 75);text-align:left;padding:11px 20px;font-weight:500">
+                          <span style="display:block;font-size:12.5px">{{ r.name }}</span>
+                          <span style="display:block;font-size:10px;font-weight:400;color:oklch(0.56 0.008 80);margin-top:1px">{{ r.role }}</span>
+                        </th>
+                        <td style="text-align:right;padding:11px 14px;font-family:'JetBrains Mono',monospace">{{ r.leads }}</td>
+                        <td style="text-align:right;padding:11px 14px;font-family:'JetBrains Mono',monospace;color:{{ r.convFg }}">{{ r.conversion }}</td>
+                        <td style="text-align:right;padding:11px 14px;font-family:'JetBrains Mono',monospace">{{ r.orders }}</td>
+                        <td style="text-align:right;padding:11px 14px;font-family:'JetBrains Mono',monospace">{{ r.delivered }}</td>
+                        <td style="text-align:right;padding:11px 14px;font-family:'JetBrains Mono',monospace">{{ r.pipeline }}</td>
+                        <td style="text-align:right;padding:11px 14px;font-family:'JetBrains Mono',monospace;color:{{ r.staleFg }}">{{ r.stale }}</td>
+                        <td style="text-align:right;padding:11px 20px 11px 14px;font-family:'JetBrains Mono',monospace;color:oklch(0.66 0.008 80)">#{{ r.rank }}</td>
+                      </tr>
+                    </sc-for>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:18px">
+              <section aria-label="Lost reason analysis" style="border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);padding:18px 20px">
+                <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px">
+                  <h2 style="margin:0;font-size:13.5px;font-weight:600">Lost reason analysis</h2>
+                  <span style="font-size:11px;color:oklch(0.58 0.008 80)">{{ br.lost.total }} lost · {{ br.lost.value }}</span>
+                </div>
+                <sc-if value="{{ br.lost.empty }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:12px;color:oklch(0.62 0.008 80)">{{ br.lost.empty }}</div>
+                </sc-if>
+                <div style="display:flex;flex-direction:column;gap:9px">
+                  <sc-for list="{{ br.lost.rows }}" as="l" hint-placeholder-count="8">
+                    <div style="display:flex;align-items:center;gap:10px">
+                      <span style="flex:none;width:172px;font-size:11.5px;color:oklch(0.82 0.006 82)">{{ l.reason }}</span>
+                      <span style="flex:1;height:8px;border-radius:3px;background:oklch(0.25 0.008 75);overflow:hidden"><span style="display:block;height:100%;width:{{ l.width }};background:oklch(0.55 0.06 200)"></span></span>
+                      <span style="flex:none;font-family:'JetBrains Mono',monospace;font-size:11.5px;width:26px;text-align:right">{{ l.count }}</span>
+                      <span style="flex:none;font-family:'JetBrains Mono',monospace;font-size:10.5px;width:64px;text-align:right;color:oklch(0.6 0.008 80)">{{ l.value }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="margin-top:14px;padding-top:12px;border-top:1px solid oklch(0.27 0.008 75);display:flex;flex-wrap:wrap;gap:14px;font-size:11px;color:oklch(0.62 0.008 80)">
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.08em;color:oklch(0.54 0.008 80)">LOST FROM STAGE</span>
+                  <sc-for list="{{ br.lost.stages }}" as="s" hint-placeholder-count="5">
+                    <span>{{ s.label }} <span style="font-family:'JetBrains Mono',monospace;color:oklch(0.9 0.004 85)">{{ s.count }}</span></span>
+                  </sc-for>
+                </div>
+              </section>
+
+              <section aria-label="Lead aging" style="border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);padding:18px 20px">
+                <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px">
+                  <h2 style="margin:0;font-size:13.5px;font-weight:600">Lead aging</h2>
+                  <span style="font-size:11px;color:oklch(0.58 0.008 80)">{{ br.aging.summary }}</span>
+                </div>
+                <sc-if value="{{ br.aging.empty }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:12px;color:oklch(0.62 0.008 80)">{{ br.aging.empty }}</div>
+                </sc-if>
+                <div style="display:flex;height:12px;border-radius:3px;overflow:hidden;margin-bottom:16px;background:oklch(0.25 0.008 75)">
+                  <sc-for list="{{ br.aging.segments }}" as="g" hint-placeholder-count="5">
+                    <span title="{{ g.title }}" style="width:{{ g.width }};background:{{ g.fill }}"></span>
+                  </sc-for>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:9px">
+                  <sc-for list="{{ br.aging.rows }}" as="a" hint-placeholder-count="5">
+                    <div style="display:flex;align-items:center;gap:10px">
+                      <span style="flex:none;width:82px;font-size:11.5px;color:oklch(0.82 0.006 82)">{{ a.label }}</span>
+                      <span style="flex:1;height:8px;border-radius:3px;background:oklch(0.25 0.008 75);overflow:hidden"><span style="display:block;height:100%;width:{{ a.width }};background:{{ a.fill }}"></span></span>
+                      <span style="flex:none;font-family:'JetBrains Mono',monospace;font-size:11.5px;width:26px;text-align:right">{{ a.count }}</span>
+                      <span style="flex:none;font-family:'JetBrains Mono',monospace;font-size:10.5px;width:64px;text-align:right;color:oklch(0.6 0.008 80)">{{ a.value }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </section>
+            </div>
+
+            <sc-if value="{{ br.summary.performance }}" hint-placeholder-val="{{ false }}">
+              <section aria-label="AI branch summary" style="border:1px solid oklch(0.34 0.03 200);border-radius:12px;background:linear-gradient(180deg,oklch(0.225 0.016 200),oklch(0.205 0.008 200));padding:19px 21px">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+                  <span style="width:10px;height:10px;background:oklch(0.79 0.10 200);transform:rotate(45deg);border-radius:2px"></span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;color:oklch(0.79 0.10 200)">AI BRANCH SUMMARY</span>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:13px">
+                  <div style="padding:13px 14px;border:1px solid oklch(0.30 0.008 75);border-radius:9px;background:oklch(0.195 0.006 75)">
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.08em;color:oklch(0.72 0.10 152);margin-bottom:7px">GOING WELL</div>
+                    <div style="font-size:12.5px;line-height:1.55;color:oklch(0.87 0.006 82);text-wrap:pretty">{{ br.summary.performance }}</div>
+                  </div>
+                  <div style="padding:13px 14px;border:1px solid oklch(0.30 0.008 75);border-radius:9px;background:oklch(0.195 0.006 75)">
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.08em;color:oklch(0.82 0.12 78);margin-bottom:7px">WHAT IS WRONG</div>
+                    <div style="font-size:12.5px;line-height:1.55;color:oklch(0.87 0.006 82);text-wrap:pretty">{{ br.summary.problem }}</div>
+                  </div>
+                  <div style="padding:13px 14px;border:1px solid oklch(0.30 0.008 75);border-radius:9px;background:oklch(0.195 0.006 75)">
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.08em;color:oklch(0.79 0.10 200);margin-bottom:7px">OPPORTUNITY</div>
+                    <div style="font-size:12.5px;line-height:1.55;color:oklch(0.87 0.006 82);text-wrap:pretty">{{ br.summary.opportunity }}</div>
+                  </div>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:15px;padding-top:14px;border-top:1px solid oklch(0.30 0.012 200)">
+                  <div style="flex:1;min-width:240px;font-size:12.5px;line-height:1.5;color:oklch(0.82 0.006 82)"><span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.08em;color:oklch(0.6 0.008 80)">DO NEXT&nbsp;&nbsp;</span>{{ br.summary.action }}</div>
+                  <sc-for list="{{ br.summary.ctas }}" as="c" hint-placeholder-count="2">
+                    <button type="button" onClick="{{ c.onClick }}" style="padding:8px 13px;border:1px solid oklch(0.36 0.03 200);border-radius:7px;background:oklch(0.24 0.02 200);cursor:pointer;font-size:12px;color:oklch(0.88 0.05 200)" style-hover="border-color:oklch(0.55 0.07 200)">{{ c.label }}</button>
+                  </sc-for>
+                </div>
+              </section>
+            </sc-if>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ show.rep }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Rep Scorecard" style="display:flex;flex-direction:column;gap:18px;animation:dpIn .28s ease-out">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:15px 18px;border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75)">
+            <button type="button" onClick="{{ rp.header.onBack }}" style="padding:5px 10px;border:1px solid oklch(0.32 0.008 75);border-radius:6px;background:transparent;cursor:pointer;font-size:11.5px;color:oklch(0.72 0.008 80)" style-hover="color:oklch(0.95 0.004 85)">‹ Branch</button>
+            <div>
+              <div style="font-size:17px;font-weight:600;letter-spacing:-0.01em">{{ rp.header.name }}</div>
+              <div style="font-size:11.5px;color:oklch(0.62 0.008 80);margin-top:2px">{{ rp.header.role }} · {{ rp.header.branch }} · {{ rp.header.joined }}</div>
+            </div>
+            <div style="flex:1"></div>
+            <button type="button" onClick="{{ rp.onActions }}" style="padding:7px 12px;border:1px solid oklch(0.34 0.008 75);border-radius:7px;background:oklch(0.235 0.006 75);cursor:pointer;font-size:12px" style-hover="border-color:oklch(0.5 0.008 75)">Their action queue</button>
+            <button type="button" onClick="{{ rp.onFunnel }}" style="padding:7px 12px;border:1px solid oklch(0.34 0.008 75);border-radius:7px;background:oklch(0.235 0.006 75);cursor:pointer;font-size:12px" style-hover="border-color:oklch(0.5 0.008 75)">Funnel vs network</button>
+          </div>
+
+          <sc-if value="{{ rp.empty }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:26px;border:1px solid oklch(0.30 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);font-size:12.5px;line-height:1.6;color:oklch(0.74 0.008 80);max-width:70ch">{{ rp.empty }}</div>
+          </sc-if>
+
+          <section aria-label="Rep metrics" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:13px">
+            <sc-for list="{{ rp.kpis }}" as="k" hint-placeholder-count="6">
+              <div style="padding:14px 15px;border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75)">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:6px">
+                  <span style="font-size:11.5px;color:oklch(0.68 0.008 80)">{{ k.label }}</span>
+                  <sc-if value="{{ k.hasWhy }}" hint-placeholder-val="{{ false }}">
+                    <button type="button" onClick="{{ k.onWhy }}" aria-label="{{ k.whyAria }}" style="flex:none;padding:2px 7px;border:1px solid oklch(0.33 0.02 200);border-radius:20px;background:transparent;cursor:pointer;font-size:10px;color:oklch(0.72 0.06 200)">Why?</button>
+                  </sc-if>
+                </div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:23px;margin-top:8px;color:{{ k.valueFg }}">{{ k.value }}</div>
+                <div style="margin-top:6px;font-size:10.5px;line-height:1.5;color:oklch(0.6 0.008 80)">{{ k.sub }}</div>
+              </div>
+            </sc-for>
+          </section>
+
+          <sc-if value="{{ rp.summary.headline }}" hint-placeholder-val="{{ false }}">
+            <section aria-label="AI rep summary" style="border:1px solid oklch(0.34 0.03 200);border-radius:12px;background:linear-gradient(180deg,oklch(0.225 0.016 200),oklch(0.205 0.008 200));padding:19px 21px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+                <span style="width:10px;height:10px;background:oklch(0.79 0.10 200);transform:rotate(45deg);border-radius:2px"></span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;color:oklch(0.79 0.10 200)">AI REP SUMMARY</span>
+              </div>
+              <p style="margin:0 0 14px;font-size:15px;line-height:1.5;font-weight:500;max-width:80ch;text-wrap:pretty">{{ rp.summary.headline }}</p>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px">
+                <div style="padding:12px 13px;border:1px solid oklch(0.30 0.008 75);border-radius:9px;background:oklch(0.195 0.006 75)">
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.08em;color:oklch(0.72 0.10 152);margin-bottom:6px">STRENGTH</div>
+                  <div style="font-size:12px;line-height:1.55;color:oklch(0.86 0.006 82)">{{ rp.summary.strength }}</div>
+                </div>
+                <div style="padding:12px 13px;border:1px solid oklch(0.30 0.008 75);border-radius:9px;background:oklch(0.195 0.006 75)">
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.08em;color:oklch(0.82 0.12 78);margin-bottom:6px">RISK</div>
+                  <div style="font-size:12px;line-height:1.55;color:oklch(0.86 0.006 82)">{{ rp.summary.risk }}</div>
+                </div>
+                <div style="padding:12px 13px;border:1px solid oklch(0.30 0.008 75);border-radius:9px;background:oklch(0.195 0.006 75)">
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.08em;color:oklch(0.79 0.10 200);margin-bottom:6px">DO NEXT</div>
+                  <div style="font-size:12px;line-height:1.55;color:oklch(0.86 0.006 82)">{{ rp.summary.action }}</div>
+                </div>
+              </div>
+            </section>
+          </sc-if>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:18px">
+            <section aria-label="Funnel performance" style="border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);padding:18px 20px">
+              <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:15px">
+                <h2 style="margin:0;font-size:13.5px;font-weight:600">Funnel performance</h2>
+                <span style="font-size:11px;color:oklch(0.58 0.008 80)">rep vs branch vs network</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <sc-for list="{{ rp.funnelRows }}" as="s" hint-placeholder-count="6">
+                  <div>
+                    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:4px">
+                      <span style="font-size:12px;color:oklch(0.84 0.006 82)">{{ s.label }}</span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:oklch(0.72 0.008 80)">{{ s.count }} · {{ s.conv }} <span style="color:oklch(0.54 0.008 80)">/ {{ s.branchConv }} / {{ s.netConv }}</span></span>
+                    </div>
+                    <div style="height:9px;border-radius:3px;background:oklch(0.25 0.008 75);overflow:hidden"><div style="height:100%;width:{{ s.width }};background:{{ s.fill }}"></div></div>
+                    <div style="height:3px;margin-top:2px;border-radius:2px;background:oklch(0.25 0.008 75);overflow:hidden"><div style="height:100%;width:{{ s.branchWidth }};background:oklch(0.5 0.03 200)"></div></div>
+                    <div style="height:3px;margin-top:1px;border-radius:2px;background:oklch(0.25 0.008 75);overflow:hidden"><div style="height:100%;width:{{ s.netWidth }};background:oklch(0.42 0.008 75)"></div></div>
+                  </div>
+                </sc-for>
+              </div>
+            </section>
+
+            <section aria-label="Stage cycle time" style="border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);padding:18px 20px">
+              <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:15px">
+                <h2 style="margin:0;font-size:13.5px;font-weight:600">Stage cycle time</h2>
+                <span style="font-size:11px;color:oklch(0.58 0.008 80)">median days · white marker = network</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:13px">
+                <sc-for list="{{ rp.cycle }}" as="c" hint-placeholder-count="5">
+                  <div>
+                    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:5px">
+                      <span style="font-size:12px;color:oklch(0.84 0.006 82)">{{ c.label }}</span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px">{{ c.value }} <span style="font-size:10px;color:oklch(0.54 0.008 80)">/ {{ c.branch }} / {{ c.network }}</span></span>
+                    </div>
+                    <div style="position:relative;height:8px;border-radius:3px;background:oklch(0.25 0.008 75)">
+                      <div style="height:100%;width:{{ c.width }};border-radius:3px;background:{{ c.fill }}"></div>
+                      <div style="position:absolute;top:-3px;bottom:-3px;left:{{ c.netMark }};width:1px;background:oklch(0.85 0.006 82)"></div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </section>
+          </div>
+
+          <section aria-label="Open pipeline" style="border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);overflow:hidden">
+            <div style="display:flex;align-items:baseline;gap:10px;padding:16px 20px 12px">
+              <h2 style="margin:0;font-size:13.5px;font-weight:600">Open pipeline</h2>
+              <span style="font-size:11px;color:oklch(0.58 0.008 80)">Click a lead for its priority explanation</span>
+            </div>
+            <sc-if value="{{ rp.pipelineEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:0 20px 20px;font-size:12px;color:oklch(0.62 0.008 80)">{{ rp.pipelineEmpty }}</div>
+            </sc-if>
+            <div style="overflow-x:auto">
+              <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:700px">
+                <thead>
+                  <tr style="background:oklch(0.192 0.006 75)">
+                    <th scope="col" style="text-align:left;padding:9px 20px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-top:1px solid oklch(0.27 0.008 75);border-bottom:1px solid oklch(0.27 0.008 75)">CUSTOMER</th>
+                    <th scope="col" style="text-align:left;padding:9px 14px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-top:1px solid oklch(0.27 0.008 75);border-bottom:1px solid oklch(0.27 0.008 75)">MODEL</th>
+                    <th scope="col" style="text-align:left;padding:9px 14px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-top:1px solid oklch(0.27 0.008 75);border-bottom:1px solid oklch(0.27 0.008 75)">STAGE</th>
+                    <th scope="col" style="text-align:right;padding:9px 14px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-top:1px solid oklch(0.27 0.008 75);border-bottom:1px solid oklch(0.27 0.008 75)">DEAL VALUE</th>
+                    <th scope="col" style="text-align:right;padding:9px 14px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-top:1px solid oklch(0.27 0.008 75);border-bottom:1px solid oklch(0.27 0.008 75)">DAYS IDLE</th>
+                    <th scope="col" style="text-align:right;padding:9px 20px 9px 14px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-top:1px solid oklch(0.27 0.008 75);border-bottom:1px solid oklch(0.27 0.008 75)">PRIORITY</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{ rp.pipeline }}" as="p" hint-placeholder-count="5">
+                    <tr onClick="{{ p.onClick }}" tabIndex="0" style="cursor:pointer;border-bottom:1px solid oklch(0.25 0.008 75)" style-hover="background:oklch(0.245 0.008 75)">
+                      <td style="padding:11px 20px">{{ p.customer }}</td>
+                      <td style="padding:11px 14px;color:oklch(0.76 0.008 80)">{{ p.model }}</td>
+                      <td style="padding:11px 14px;color:oklch(0.76 0.008 80)">{{ p.stage }}</td>
+                      <td style="text-align:right;padding:11px 14px;font-family:'JetBrains Mono',monospace">{{ p.value }}</td>
+                      <td style="text-align:right;padding:11px 14px;font-family:'JetBrains Mono',monospace">{{ p.idle }}</td>
+                      <td style="text-align:right;padding:11px 20px 11px 14px;font-family:'JetBrains Mono',monospace;color:{{ p.scoreFg }}">{{ p.score }}</td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ show.actions }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Action Center" style="display:flex;flex-direction:column;gap:18px;animation:dpIn .28s ease-out">
+          <section aria-label="Queue summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px">
+            <sc-for list="{{ act.summary }}" as="t" hint-placeholder-count="3">
+              <button type="button" onClick="{{ t.onClick }}" aria-pressed="{{ t.active }}" style="text-align:left;padding:15px 16px;border:1px solid oklch(0.285 0.008 75);border-left:3px solid {{ t.color }};border-radius:10px;background:{{ t.bgActive }};cursor:pointer" style-hover="border-color:oklch(0.45 0.008 75)">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.08em;font-weight:600;background:{{ t.bg }};color:{{ t.fg }}">{{ t.label }}</span>
+                </div>
+                <div style="display:flex;align-items:baseline;gap:9px;margin-top:10px">
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:27px">{{ t.count }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:oklch(0.74 0.008 80)">{{ t.value }}</span>
+                </div>
+                <div style="margin-top:6px;font-size:10.5px;color:oklch(0.58 0.008 80)">{{ t.hint }}</div>
+              </button>
+            </sc-for>
+          </section>
+
+          <section aria-label="AI recommended actions" style="border:1px solid oklch(0.34 0.03 200);border-radius:12px;background:linear-gradient(180deg,oklch(0.225 0.016 200),oklch(0.205 0.008 200));padding:19px 21px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+              <span style="width:10px;height:10px;background:oklch(0.79 0.10 200);transform:rotate(45deg);border-radius:2px"></span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;color:oklch(0.79 0.10 200)">AI RECOMMENDED ACTIONS</span>
+            </div>
+            <p style="margin:0 0 16px;font-size:16px;line-height:1.5;font-weight:500;max-width:88ch;text-wrap:pretty">{{ act.recHeadline }}</p>
+            <div style="display:flex;flex-direction:column;gap:11px">
+              <sc-for list="{{ act.recs }}" as="r" hint-placeholder-count="4">
+                <div style="padding:14px 15px;border:1px solid oklch(0.30 0.008 75);border-radius:9px;background:oklch(0.195 0.006 75)">
+                  <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:9px;margin-bottom:9px">
+                    <span style="padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.08em;background:oklch(0.28 0.02 200);color:oklch(0.85 0.06 200)">{{ r.horizon }}</span>
+                    <span style="font-size:13px;font-weight:500;color:oklch(0.93 0.004 85);text-wrap:pretty">{{ r.problem }}</span>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;padding:10px 12px;border-radius:7px;background:oklch(0.175 0.006 75);margin-bottom:10px">
+                    <sc-for list="{{ r.evidence }}" as="e" hint-placeholder-count="4">
+                      <div>
+                        <div style="font-size:10px;color:oklch(0.58 0.008 80);margin-bottom:3px">{{ e.label }}</div>
+                        <div style="font-family:'JetBrains Mono',monospace;font-size:12px">{{ e.value }}</div>
+                        <div style="font-size:9.5px;color:oklch(0.52 0.008 80);margin-top:2px">{{ e.note }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="font-size:11.5px;line-height:1.55;color:oklch(0.7 0.008 80);margin-bottom:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.08em;color:oklch(0.56 0.008 80)">IMPACT&nbsp;&nbsp;</span>{{ r.impact }}</div>
+                  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+                    <div style="flex:1;min-width:220px;font-size:12.5px;line-height:1.5;color:oklch(0.87 0.006 82);text-wrap:pretty">{{ r.action }}</div>
+                    <button type="button" onClick="{{ r.onCta }}" style="padding:7px 12px;border:1px solid oklch(0.36 0.03 200);border-radius:7px;background:oklch(0.24 0.02 200);cursor:pointer;font-size:12px;color:oklch(0.88 0.05 200)" style-hover="border-color:oklch(0.55 0.07 200)">{{ r.ctaLabel }}</button>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section aria-label="Prioritised leads" style="border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);overflow:hidden">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:9px;padding:15px 20px 13px;border-bottom:1px solid oklch(0.27 0.008 75)">
+              <select value="{{ act.filters.branch }}" onChange="{{ act.filters.onBranch }}" aria-label="Filter by branch" style="padding:6px 9px;border:1px solid oklch(0.30 0.008 75);border-radius:7px;background:oklch(0.19 0.006 75);font-size:11.5px">
+                <sc-for list="{{ act.filters.branches }}" as="o" hint-placeholder-count="6"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+              </select>
+              <select value="{{ act.filters.rep }}" onChange="{{ act.filters.onRep }}" aria-label="Filter by rep" style="padding:6px 9px;border:1px solid oklch(0.30 0.008 75);border-radius:7px;background:oklch(0.19 0.006 75);font-size:11.5px">
+                <sc-for list="{{ act.filters.reps }}" as="o" hint-placeholder-count="8"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+              </select>
+              <select value="{{ act.filters.stage }}" onChange="{{ act.filters.onStage }}" aria-label="Filter by stage" style="padding:6px 9px;border:1px solid oklch(0.30 0.008 75);border-radius:7px;background:oklch(0.19 0.006 75);font-size:11.5px">
+                <sc-for list="{{ act.filters.stages }}" as="o" hint-placeholder-count="6"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+              </select>
+              <select value="{{ act.filters.age }}" onChange="{{ act.filters.onAge }}" aria-label="Filter by age" style="padding:6px 9px;border:1px solid oklch(0.30 0.008 75);border-radius:7px;background:oklch(0.19 0.006 75);font-size:11.5px">
+                <sc-for list="{{ act.filters.ages }}" as="o" hint-placeholder-count="6"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+              </select>
+              <select value="{{ act.filters.minValue }}" onChange="{{ act.filters.onValue }}" aria-label="Minimum deal value" style="padding:6px 9px;border:1px solid oklch(0.30 0.008 75);border-radius:7px;background:oklch(0.19 0.006 75);font-size:11.5px">
+                <sc-for list="{{ act.filters.values }}" as="o" hint-placeholder-count="4"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+              </select>
+              <sc-if value="{{ act.filters.hasAny }}" hint-placeholder-val="{{ false }}">
+                <button type="button" onClick="{{ act.filters.onClear }}" style="padding:6px 10px;border:1px solid oklch(0.32 0.008 75);border-radius:7px;background:transparent;cursor:pointer;font-size:11.5px;color:oklch(0.72 0.008 80)" style-hover="color:oklch(0.95 0.004 85)">Clear filters</button>
+              </sc-if>
+              <div style="flex:1"></div>
+              <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:oklch(0.6 0.008 80)">Sort
+                <select value="{{ act.filters.sort }}" onChange="{{ act.filters.onSort }}" aria-label="Sort queue" style="padding:6px 9px;border:1px solid oklch(0.30 0.008 75);border-radius:7px;background:oklch(0.19 0.006 75);font-size:11.5px">
+                  <sc-for list="{{ act.filters.sorts }}" as="o" hint-placeholder-count="3"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+                </select>
+              </label>
+              <button type="button" onClick="{{ act.onExport }}" style="padding:6px 11px;border:1px solid oklch(0.34 0.008 75);border-radius:7px;background:oklch(0.235 0.006 75);cursor:pointer;font-size:11.5px" style-hover="border-color:oklch(0.5 0.008 75)">Export CSV</button>
+            </div>
+            <div style="padding:10px 20px;font-size:11.5px;color:oklch(0.62 0.008 80);border-bottom:1px solid oklch(0.27 0.008 75)">Showing {{ act.count }} of {{ act.total }} open leads · {{ act.totalValue }} in scope</div>
+            <sc-if value="{{ act.empty }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:44px 20px;text-align:center">
+                <div style="width:22px;height:22px;margin:0 auto 12px;border-radius:50%;border:1px solid oklch(0.42 0.008 75)"></div>
+                <div style="font-size:13px;color:oklch(0.8 0.006 82)">{{ act.empty }}</div>
+              </div>
+            </sc-if>
+            <div style="overflow-x:auto">
+              <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:1180px">
+                <thead>
+                  <tr style="background:oklch(0.192 0.006 75)">
+                    <th scope="col" style="position:sticky;left:0;z-index:2;background:oklch(0.192 0.006 75);text-align:left;padding:9px 20px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-bottom:1px solid oklch(0.27 0.008 75)">CUSTOMER</th>
+                    <th scope="col" style="text-align:left;padding:9px 12px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-bottom:1px solid oklch(0.27 0.008 75)">MODEL</th>
+                    <th scope="col" style="text-align:left;padding:9px 12px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-bottom:1px solid oklch(0.27 0.008 75)">BRANCH / REP</th>
+                    <th scope="col" style="text-align:left;padding:9px 12px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-bottom:1px solid oklch(0.27 0.008 75)">STAGE</th>
+                    <th scope="col" style="text-align:right;padding:9px 12px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-bottom:1px solid oklch(0.27 0.008 75)">DEAL VALUE</th>
+                    <th scope="col" style="text-align:right;padding:9px 12px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-bottom:1px solid oklch(0.27 0.008 75)">IDLE</th>
+                    <th scope="col" style="text-align:right;padding:9px 12px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-bottom:1px solid oklch(0.27 0.008 75)">PRIORITY</th>
+                    <th scope="col" style="text-align:left;padding:9px 12px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-bottom:1px solid oklch(0.27 0.008 75)">REASON</th>
+                    <th scope="col" style="text-align:left;padding:9px 20px 9px 12px;font-size:10px;letter-spacing:0.08em;color:oklch(0.6 0.008 80);border-bottom:1px solid oklch(0.27 0.008 75)">ACTION</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{ act.rows }}" as="r" hint-placeholder-count="8">
+                    <tr style="border-bottom:1px solid oklch(0.25 0.008 75)" style-hover="background:oklch(0.235 0.008 75)">
+                      <th scope="row" style="position:sticky;left:0;z-index:1;background:oklch(0.212 0.006 75);text-align:left;padding:11px 20px;font-weight:500">
+                        <div style="display:flex;align-items:center;gap:9px">
+                          <span style="flex:none;width:3px;height:24px;border-radius:2px;background:{{ r.accent }}"></span>
+                          <span>
+                            <span style="display:block;font-size:12.5px">{{ r.customer }}</span>
+                            <span style="display:block;font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:400;color:oklch(0.54 0.008 80)">{{ r.id }}</span>
+                          </span>
+                        </div>
+                      </th>
+                      <td style="padding:11px 12px;color:oklch(0.78 0.008 80)">{{ r.model }}</td>
+                      <td style="padding:11px 12px;color:oklch(0.78 0.008 80)">
+                        <span style="display:block;font-size:11.5px">{{ r.branch }}</span>
+                        <span style="display:block;font-size:10.5px;color:oklch(0.56 0.008 80)">{{ r.rep }}</span>
+                      </td>
+                      <td style="padding:11px 12px"><span style="padding:2px 8px;border-radius:4px;font-size:10.5px;background:{{ r.tierBg }};color:{{ r.tierFg }}">{{ r.stage }}</span></td>
+                      <td style="text-align:right;padding:11px 12px;font-family:'JetBrains Mono',monospace">{{ r.value }}</td>
+                      <td style="text-align:right;padding:11px 12px;font-family:'JetBrains Mono',monospace">{{ r.idle }}</td>
+                      <td style="text-align:right;padding:11px 12px;font-family:'JetBrains Mono',monospace;font-size:13.5px">{{ r.score }}</td>
+                      <td style="padding:11px 12px;max-width:290px;font-size:11px;line-height:1.5;color:oklch(0.7 0.008 80);text-wrap:pretty">
+                        {{ r.reason }}
+                        <button type="button" onClick="{{ r.onWhy }}" style="display:block;margin-top:4px;padding:0;border:0;background:transparent;cursor:pointer;font-size:10.5px;color:oklch(0.76 0.08 200);text-decoration:underline" style-hover="color:oklch(0.9 0.06 200)">Why is this high priority?</button>
+                      </td>
+                      <td style="padding:11px 20px 11px 12px;white-space:nowrap">
+                        <sc-if value="{{ r.isDone }}" hint-placeholder-val="{{ false }}">
+                          <span style="padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600;background:oklch(0.28 0.05 152);color:oklch(0.86 0.10 152)">{{ r.doneLabel }}</span>
+                        </sc-if>
+                        <span style="display:flex;gap:5px">
+                          <button type="button" onClick="{{ r.onContact }}" style="padding:4px 8px;border:1px solid oklch(0.34 0.008 75);border-radius:6px;background:oklch(0.235 0.006 75);cursor:pointer;font-size:10.5px" style-hover="border-color:oklch(0.55 0.008 75)">Contact</button>
+                          <button type="button" onClick="{{ r.onAssign }}" style="padding:4px 8px;border:1px solid oklch(0.34 0.008 75);border-radius:6px;background:oklch(0.235 0.006 75);cursor:pointer;font-size:10.5px" style-hover="border-color:oklch(0.55 0.008 75)">Assign</button>
+                          <button type="button" onClick="{{ r.onEscalate }}" style="padding:4px 8px;border:1px solid oklch(0.40 0.05 27);border-radius:6px;background:oklch(0.25 0.03 27);cursor:pointer;font-size:10.5px;color:oklch(0.88 0.09 27)" style-hover="border-color:oklch(0.58 0.10 27)">Escalate</button>
+                        </span>
+                      </td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ show.funnel }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Funnel Diagnostics" style="display:flex;flex-direction:column;gap:18px;animation:dpIn .28s ease-out">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:14px 18px;border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75)">
+            <label style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:oklch(0.66 0.008 80)">Compare
+              <select value="{{ fn.scopeValue }}" onChange="{{ fn.onScope }}" aria-label="Funnel scope" style="padding:6px 10px;border:1px solid oklch(0.30 0.008 75);border-radius:7px;background:oklch(0.19 0.006 75);font-size:12px;max-width:260px">
+                <sc-for list="{{ fn.scopeOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+              </select>
+            </label>
+            <span style="font-size:11.5px;color:oklch(0.62 0.008 80)">against the network baseline</span>
+            <div style="flex:1"></div>
+            <span style="font-size:11.5px;color:oklch(0.7 0.008 80)">{{ fn.flaggedNote }}</span>
+          </div>
+
+          <sc-if value="{{ fn.empty }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:36px;text-align:center;border:1px solid oklch(0.30 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);font-size:13px;color:oklch(0.78 0.006 82)">{{ fn.empty }}</div>
+          </sc-if>
+
+          <section aria-label="Funnel stages" style="border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);padding:18px 20px">
+            <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-bottom:18px">
+              <h2 style="margin:0;font-size:13.5px;font-weight:600">{{ fn.scopeName }} funnel</h2>
+              <span style="font-size:11px;color:oklch(0.58 0.008 80)">volume · conversion · median duration. Thin bar is the network baseline shape.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:15px">
+              <sc-for list="{{ fn.stages }}" as="s" hint-placeholder-count="6">
+                <div>
+                  <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:9px;margin-bottom:5px">
+                    <span style="font-size:12.5px;font-weight:500;color:oklch(0.9 0.004 85)">{{ s.label }}</span>
+                    <sc-if value="{{ s.flagged }}" hint-placeholder-val="{{ false }}">
+                      <span style="padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.08em;background:{{ s.flagBg }};color:{{ s.flagFg }}">{{ s.flagLabel }} · z {{ s.z }}</span>
+                    </sc-if>
+                    <div style="flex:1"></div>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">{{ s.count }}</span>
+                    <sc-if value="{{ s.notEntry }}" hint-placeholder-val="{{ true }}">
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:oklch(0.7 0.008 80)">{{ s.conv }} <span style="color:oklch(0.52 0.008 80)">/ {{ s.netConv }} net</span></span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:oklch(0.66 0.008 80);min-width:96px;text-align:right">{{ s.median }} med · {{ s.p90 }} p90</span>
+                    </sc-if>
+                  </div>
+                  <div style="height:14px;border-radius:3px;background:oklch(0.25 0.008 75);overflow:hidden"><div style="height:100%;width:{{ s.width }};border-radius:3px;background:{{ s.fill }}"></div></div>
+                  <sc-if value="{{ fn.compare }}" hint-placeholder-val="{{ false }}">
+                    <div style="height:4px;margin-top:3px;border-radius:2px;background:oklch(0.25 0.008 75);overflow:hidden"><div style="height:100%;width:{{ s.netWidth }};background:oklch(0.48 0.008 75)"></div></div>
+                  </sc-if>
+                  <sc-if value="{{ s.notEntry }}" hint-placeholder-val="{{ true }}">
+                    <div style="margin-top:4px;font-size:10.5px;color:oklch(0.56 0.008 80)">{{ s.drop }} did not progress · {{ s.lost }} marked lost from the previous stage</div>
+                  </sc-if>
+                  <sc-if value="{{ s.entryNote }}" hint-placeholder-val="{{ false }}">
+                    <div style="margin-top:4px;font-size:10.5px;color:oklch(0.56 0.008 80)">{{ s.entryNote }}</div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section aria-label="AI funnel explanation" style="border:1px solid oklch(0.34 0.03 200);border-radius:12px;background:linear-gradient(180deg,oklch(0.225 0.016 200),oklch(0.205 0.008 200));padding:19px 21px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+              <span style="width:10px;height:10px;background:oklch(0.79 0.10 200);transform:rotate(45deg);border-radius:2px"></span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;color:oklch(0.79 0.10 200)">AI FUNNEL EXPLANATION</span>
+            </div>
+            <p style="margin:0;font-size:15.5px;line-height:1.55;font-weight:500;max-width:92ch;text-wrap:pretty">{{ fn.explanation }}</p>
+            <button type="button" onClick="{{ fn.onActions }}" style="margin-top:15px;padding:8px 13px;border:1px solid oklch(0.36 0.03 200);border-radius:7px;background:oklch(0.24 0.02 200);cursor:pointer;font-size:12px;color:oklch(0.88 0.05 200)" style-hover="border-color:oklch(0.55 0.07 200)">Work the affected leads</button>
+          </section>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:18px">
+            <section aria-label="Stage bottlenecks" style="border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);padding:18px 20px">
+              <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:15px">
+                <h2 style="margin:0;font-size:13.5px;font-weight:600">Stage bottlenecks</h2>
+                <span style="font-size:11px;color:oklch(0.58 0.008 80)">ranked by median days in stage</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <sc-for list="{{ fn.bottlenecks }}" as="b" hint-placeholder-count="5">
+                  <div>
+                    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:5px">
+                      <span style="font-size:12px;color:oklch(0.88 0.006 82)">{{ b.label }}</span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:12px">{{ b.median }} <span style="font-size:10px;color:oklch(0.54 0.008 80)">p90 {{ b.p90 }}</span></span>
+                    </div>
+                    <div style="height:8px;border-radius:3px;background:oklch(0.25 0.008 75);overflow:hidden"><div style="height:100%;width:{{ b.width }};background:{{ b.fill }}"></div></div>
+                    <div style="margin-top:5px;font-size:10.5px;line-height:1.5;color:oklch(0.62 0.008 80)">{{ b.text }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </section>
+
+            <section aria-label="Lead source quality" style="border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);padding:18px 20px">
+              <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:15px">
+                <h2 style="margin:0;font-size:13.5px;font-weight:600">Lead source quality</h2>
+                <span style="font-size:11px;color:oklch(0.58 0.008 80)">lead → delivery conversion by source</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <sc-for list="{{ fn.sources }}" as="s" hint-placeholder-count="6">
+                  <div>
+                    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:5px">
+                      <span style="font-size:12px;color:oklch(0.88 0.006 82)">{{ s.label }}</span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:12px">{{ s.conv }}</span>
+                    </div>
+                    <div style="height:8px;border-radius:3px;background:oklch(0.25 0.008 75);overflow:hidden"><div style="height:100%;width:{{ s.width }};background:{{ s.fill }}"></div></div>
+                    <div style="margin-top:5px;font-size:10.5px;color:oklch(0.6 0.008 80)">{{ s.leads }} leads → {{ s.delivered }} delivered · {{ s.revenue }} · contact rate {{ s.contact }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </section>
+          </div>
+
+          <section aria-label="Delivery operations" style="border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);padding:18px 20px">
+            <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-bottom:15px">
+              <h2 style="margin:0;font-size:13.5px;font-weight:600">Delivery operations</h2>
+              <span style="font-size:11px;color:oklch(0.58 0.008 80)">{{ fn.delivery.count }} deliveries · {{ fn.delivery.delayed }} with a recorded delay reason ({{ fn.delivery.rate }}) · median {{ fn.delivery.median }}, p90 {{ fn.delivery.p90 }}</span>
+            </div>
+            <sc-if value="{{ fn.delivery.empty }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:12px;color:oklch(0.62 0.008 80)">{{ fn.delivery.empty }}</div>
+            </sc-if>
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <sc-for list="{{ fn.delivery.rows }}" as="d" hint-placeholder-count="7">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span style="flex:none;width:220px;font-size:11.5px;color:oklch(0.84 0.006 82)">{{ d.reason }}</span>
+                  <span style="flex:1;height:8px;border-radius:3px;background:oklch(0.25 0.008 75);overflow:hidden"><span style="display:block;height:100%;width:{{ d.width }};background:oklch(0.72 0.11 78)"></span></span>
+                  <span style="flex:none;font-family:'JetBrains Mono',monospace;font-size:11.5px;width:26px;text-align:right">{{ d.count }}</span>
+                  <span style="flex:none;font-family:'JetBrains Mono',monospace;font-size:10.5px;width:44px;text-align:right;color:oklch(0.6 0.008 80)">{{ d.share }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ show.about }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="About" style="display:flex;flex-direction:column;gap:18px;max-width:960px;animation:dpIn .28s ease-out">
+          <section style="border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);padding:20px 22px">
+            <h2 style="margin:0 0 4px;font-size:14px;font-weight:600">How every number is computed</h2>
+            <p style="margin:0 0 18px;font-size:12px;color:oklch(0.62 0.008 80)">Definitions matter more than charts. These are the ones this product commits to.</p>
+            <dl style="margin:0;display:flex;flex-direction:column;gap:15px">
+              <sc-for list="{{ about.rows }}" as="r" hint-placeholder-count="8">
+                <div style="padding-bottom:15px;border-bottom:1px solid oklch(0.26 0.008 75)">
+                  <dt style="font-size:12.5px;font-weight:600;color:oklch(0.94 0.004 85);margin-bottom:5px">{{ r.term }}</dt>
+                  <dd style="margin:0;font-size:12px;line-height:1.65;color:oklch(0.76 0.008 80);max-width:88ch;text-wrap:pretty">{{ r.def }}</dd>
+                </div>
+              </sc-for>
+            </dl>
+          </section>
+          <section style="border:1px solid oklch(0.285 0.008 75);border-radius:10px;background:oklch(0.212 0.006 75);padding:20px 22px">
+            <h2 style="margin:0 0 14px;font-size:14px;font-weight:600">Architecture</h2>
+            <div style="display:flex;flex-direction:column;gap:11px">
+              <sc-for list="{{ about.stack }}" as="s" hint-placeholder-count="4">
+                <div style="display:flex;flex-wrap:wrap;gap:10px;font-size:12px">
+                  <span style="flex:none;width:88px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.08em;color:oklch(0.58 0.008 80);padding-top:2px">{{ s.k }}</span>
+                  <span style="flex:1;min-width:220px;line-height:1.6;color:oklch(0.8 0.006 82)">{{ s.v }}</span>
+                </div>
+              </sc-for>
+              <div style="display:flex;flex-wrap:wrap;gap:10px;font-size:12px;padding-top:12px;margin-top:3px;border-top:1px solid oklch(0.26 0.008 75)">
+                <span style="flex:none;width:88px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.08em;color:oklch(0.58 0.008 80);padding-top:2px">TESTS</span>
+                <span style="flex:1;min-width:220px;line-height:1.6;color:oklch(0.8 0.006 82)">Funnel, conversion, aging, idle days, target attainment, revenue at risk, branch comparison, rep ranking, anomaly detection, priority scoring and insight generation are covered by assertions that recompute each expected value independently from the raw JSON. <a href="./Analytics Tests.dc.html">Run the suite ›</a></span>
+              </div>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+
+    </main>
+  </div>
+
+  <sc-if value="{{ ask.open }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="Ask DealerPulse" style="position:fixed;inset:0;z-index:80;display:flex;align-items:flex-start;justify-content:center;padding:80px 20px 20px;background:oklch(0.12 0.006 75 / 0.72);backdrop-filter:blur(3px);overflow-y:auto">
+      <div style="width:100%;max-width:720px;border:1px solid oklch(0.36 0.035 200);border-radius:13px;background:oklch(0.205 0.006 75);box-shadow:0 24px 60px oklch(0.08 0.006 75 / 0.7);animation:dpIn .2s ease-out">
+        <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid oklch(0.29 0.008 75)">
+          <span style="flex:none;width:13px;height:13px;background:oklch(0.79 0.10 200);transform:rotate(45deg);border-radius:2px"></span>
+          <input value="{{ ask.q }}" onChange="{{ ask.onInput }}" onKeyDown="{{ ask.onKey }}" autoFocus="{{ true }}" placeholder="Ask about branches, reps, leads, revenue, delays…" aria-label="Your question" style="flex:1;min-width:0;padding:6px 0;border:0;background:transparent;font-size:15px;outline:none" />
+          <button type="button" onClick="{{ ask.onSubmit }}" style="padding:6px 12px;border:1px solid oklch(0.79 0.10 200);border-radius:7px;background:oklch(0.79 0.10 200);color:oklch(0.17 0.02 200);cursor:pointer;font-size:12px;font-weight:600">Ask</button>
+          <button type="button" onClick="{{ ask.onClose }}" aria-label="Close" style="padding:5px 9px;border:1px solid oklch(0.32 0.008 75);border-radius:7px;background:transparent;cursor:pointer;font-size:12px;color:oklch(0.68 0.008 80)">Esc</button>
+        </div>
+        <sc-if value="{{ ask.hasRes }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:16px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.1em;color:oklch(0.6 0.008 80);margin-bottom:6px">INTERPRETED AS</div>
+            <div style="font-size:12px;color:oklch(0.76 0.008 80);margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid oklch(0.27 0.008 75)">{{ ask.res.interpretation }}</div>
+            <p style="margin:0 0 16px;font-size:15px;line-height:1.55;font-weight:500;text-wrap:pretty">{{ ask.res.answer }}</p>
+            <sc-if value="{{ ask.res.unanswered }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:12px;color:oklch(0.66 0.008 80);margin-bottom:12px">Try one of the questions below — the answer engine only reports figures it can compute from the dataset.</div>
+            </sc-if>
+            <div style="display:flex;flex-direction:column;gap:1px;border-radius:8px;overflow:hidden;background:oklch(0.29 0.008 75)">
+              <sc-for list="{{ ask.res.evidence }}" as="e" hint-placeholder-count="4">
+                <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;padding:9px 12px;background:oklch(0.185 0.006 75)">
+                  <span style="flex:1;min-width:150px;font-size:12px;color:oklch(0.8 0.006 82)">{{ e.label }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:{{ e.fg }}">{{ e.value }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:oklch(0.56 0.008 80);min-width:118px;text-align:right">{{ e.baseline }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <sc-if value="{{ ask.res.hasCta }}" hint-placeholder-val="{{ false }}">
+              <button type="button" onClick="{{ ask.res.onCta }}" style="margin-top:14px;padding:8px 13px;border:1px solid oklch(0.36 0.03 200);border-radius:7px;background:oklch(0.24 0.02 200);cursor:pointer;font-size:12px;color:oklch(0.88 0.05 200)" style-hover="border-color:oklch(0.55 0.07 200)">{{ ask.res.ctaLabel }}</button>
+            </sc-if>
+          </div>
+        </sc-if>
+        <div style="padding:14px 16px;border-top:1px solid oklch(0.29 0.008 75)">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.1em;color:oklch(0.56 0.008 80);margin-bottom:9px">TRY</div>
+          <div style="display:flex;flex-wrap:wrap;gap:7px">
+            <sc-for list="{{ ask.samples }}" as="s" hint-placeholder-count="9">
+              <button type="button" onClick="{{ s.onClick }}" style="padding:5px 10px;border:1px solid oklch(0.30 0.008 75);border-radius:20px;background:oklch(0.19 0.006 75);cursor:pointer;font-size:11.5px;color:oklch(0.78 0.008 80)" style-hover="border-color:oklch(0.5 0.06 200);color:oklch(0.95 0.004 85)">{{ s.q }}</button>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ why.open }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="{{ why.title }}" style="position:fixed;inset:0;z-index:85;display:flex;align-items:center;justify-content:center;padding:20px;background:oklch(0.12 0.006 75 / 0.66)">
+      <div style="width:100%;max-width:480px;border:1px solid oklch(0.36 0.035 200);border-radius:12px;background:oklch(0.205 0.006 75);box-shadow:0 20px 50px oklch(0.08 0.006 75 / 0.7);animation:dpIn .18s ease-out">
+        <div style="display:flex;align-items:center;gap:9px;padding:14px 16px;border-bottom:1px solid oklch(0.29 0.008 75)">
+          <span style="flex:none;width:11px;height:11px;background:oklch(0.79 0.10 200);transform:rotate(45deg);border-radius:2px"></span>
+          <span style="flex:1;font-size:13.5px;font-weight:600">{{ why.title }}</span>
+          <button type="button" onClick="{{ why.onClose }}" aria-label="Close" style="padding:4px 8px;border:1px solid oklch(0.32 0.008 75);border-radius:6px;background:transparent;cursor:pointer;font-size:11.5px;color:oklch(0.68 0.008 80)">Close</button>
+        </div>
+        <div style="padding:6px 16px 14px">
+          <sc-for list="{{ why.points }}" as="p" hint-placeholder-count="4">
+            <div style="display:flex;align-items:baseline;gap:12px;padding:11px 0;border-bottom:1px solid oklch(0.26 0.008 75)">
+              <span style="flex:none;width:5px;height:5px;border-radius:50%;background:oklch(0.6 0.06 200);margin-top:6px"></span>
+              <span style="flex:1;font-size:12px;line-height:1.55;color:oklch(0.82 0.006 82);text-wrap:pretty">{{ p.text }}</span>
+              <span style="flex:none;font-family:'JetBrains Mono',monospace;font-size:12px;color:oklch(0.94 0.004 85)">{{ p.value }}</span>
+            </div>
+          </sc-for>
+          <button type="button" onClick="{{ why.onCta }}" style="margin-top:14px;padding:8px 13px;border:1px solid oklch(0.36 0.03 200);border-radius:7px;background:oklch(0.24 0.02 200);cursor:pointer;font-size:12px;color:oklch(0.88 0.05 200)" style-hover="border-color:oklch(0.55 0.07 200)">{{ why.ctaLabel }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ lead.open }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="Lead detail" style="position:fixed;inset:0;z-index:90;display:flex;justify-content:flex-end;background:oklch(0.12 0.006 75 / 0.6)">
+      <div style="width:100%;max-width:460px;height:100%;overflow-y:auto;border-left:1px solid oklch(0.32 0.008 75);background:oklch(0.198 0.006 75);box-shadow:-20px 0 50px oklch(0.08 0.006 75 / 0.6)">
+        <div style="position:sticky;top:0;display:flex;align-items:flex-start;gap:10px;padding:16px 18px;background:oklch(0.198 0.006 75);border-bottom:1px solid oklch(0.29 0.008 75)">
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:600">{{ lead.customer }}</div>
+            <div style="font-size:11.5px;color:oklch(0.62 0.008 80);margin-top:3px">{{ lead.id }} · {{ lead.model }} · {{ lead.meta }}</div>
+          </div>
+          <button type="button" onClick="{{ lead.onClose }}" aria-label="Close" style="padding:4px 9px;border:1px solid oklch(0.32 0.008 75);border-radius:6px;background:transparent;cursor:pointer;font-size:11.5px;color:oklch(0.68 0.008 80)">Close</button>
+        </div>
+        <div style="padding:16px 18px">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px">
+            <span style="width:10px;height:10px;background:oklch(0.79 0.10 200);transform:rotate(45deg);border-radius:2px"></span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.12em;color:oklch(0.79 0.10 200)">AI LEAD EXPLANATION</span>
+            <div style="flex:1"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:15px">P{{ lead.score }}</span>
+          </div>
+          <p style="margin:0 0 16px;font-size:13.5px;line-height:1.6;text-wrap:pretty">{{ lead.headline }}</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px">
+            <div style="padding:10px 11px;border:1px solid oklch(0.29 0.008 75);border-radius:8px;background:oklch(0.18 0.006 75)">
+              <div style="font-size:10px;color:oklch(0.58 0.008 80)">Stage</div>
+              <div style="font-size:12.5px;margin-top:3px">{{ lead.stage }}</div>
+            </div>
+            <div style="padding:10px 11px;border:1px solid oklch(0.29 0.008 75);border-radius:8px;background:oklch(0.18 0.006 75)">
+              <div style="font-size:10px;color:oklch(0.58 0.008 80)">Deal value</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12.5px;margin-top:3px">{{ lead.value }}</div>
+            </div>
+            <div style="padding:10px 11px;border:1px solid oklch(0.29 0.008 75);border-radius:8px;background:oklch(0.18 0.006 75)">
+              <div style="font-size:10px;color:oklch(0.58 0.008 80)">Inactivity</div>
+              <div style="font-size:12.5px;margin-top:3px">{{ lead.idle }}</div>
+            </div>
+            <div style="padding:10px 11px;border:1px solid oklch(0.29 0.008 75);border-radius:8px;background:oklch(0.18 0.006 75)">
+              <div style="font-size:10px;color:oklch(0.58 0.008 80)">Expected close</div>
+              <div style="font-size:12.5px;margin-top:3px">{{ lead.expected }}</div>
+            </div>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.1em;color:oklch(0.56 0.008 80);margin-bottom:8px">PRIORITY DRIVERS</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+            <sc-for list="{{ lead.drivers }}" as="d" hint-placeholder-count="3">
+              <div style="padding:9px 11px;border-left:2px solid oklch(0.5 0.05 200);border-radius:0 7px 7px 0;background:oklch(0.18 0.006 75)">
+                <div style="font-size:11px;font-weight:600;color:oklch(0.9 0.004 85)">{{ d.label }}</div>
+                <div style="font-size:11.5px;line-height:1.5;color:oklch(0.74 0.008 80);margin-top:2px">{{ d.detail }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.1em;color:oklch(0.56 0.008 80);margin-bottom:8px">STATUS HISTORY</div>
+          <div style="display:flex;flex-direction:column;gap:0;margin-bottom:16px">
+            <sc-for list="{{ lead.history }}" as="h" hint-placeholder-count="4">
+              <div style="display:flex;gap:11px;padding:9px 0;border-bottom:1px solid oklch(0.26 0.008 75)">
+                <span style="flex:none;width:74px;font-family:'JetBrains Mono',monospace;font-size:10px;color:oklch(0.58 0.008 80);padding-top:2px">{{ h.date }}</span>
+                <span style="flex:1">
+                  <span style="display:block;font-size:11.5px;font-weight:600;color:oklch(0.9 0.004 85)">{{ h.status }}</span>
+                  <span style="display:block;font-size:11px;line-height:1.5;color:oklch(0.68 0.008 80);margin-top:2px">{{ h.note }}</span>
+                </span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button type="button" onClick="{{ lead.onRep }}" style="padding:7px 12px;border:1px solid oklch(0.34 0.008 75);border-radius:7px;background:oklch(0.235 0.006 75);cursor:pointer;font-size:12px" style-hover="border-color:oklch(0.5 0.008 75)">Rep scorecard</button>
+            <button type="button" onClick="{{ lead.onBranch }}" style="padding:7px 12px;border:1px solid oklch(0.34 0.008 75);border-radius:7px;background:oklch(0.235 0.006 75);cursor:pointer;font-size:12px" style-hover="border-color:oklch(0.5 0.008 75)">Branch detail</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div role="status" aria-live="polite" style="position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:95;padding:10px 16px;border:1px solid oklch(0.36 0.008 75);border-radius:8px;background:oklch(0.24 0.006 75);box-shadow:0 12px 30px oklch(0.08 0.006 75 / 0.6);font-size:12.5px;animation:dpIn .18s ease-out">{{ toast }}</div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1024}}">
+class Component extends DCLogic {
+  state = {
+    loading: true, error: null, wide: true, railOpen: true,
+    route: { screen: 'overview', branchId: '', repId: '', anchor: '' },
+    filters: { range: 'all', branchId: '', repId: '' },
+    ask: { open: false, q: '', res: null },
+    why: null, lead: null, toast: null, done: {},
+    openInsights: {},
+    act: { branch: '', rep: '', stage: '', tier: '', age: '', minValue: '0', sort: 'priority' },
+    branchSort: 'conversion', repSort: 'conversion',
+    funScope: 'network', funScopeId: '',
+    skeleton: [1, 2, 3, 4]
+  };
+
+  componentDidMount() {
+    this.cache = {};
+    this.readHash();
+    this._hash = () => this.readHash();
+    this._resize = () => {
+      const wide = window.innerWidth > 1120;
+      if (wide !== this.state.wide) this.setState({ wide });
+    };
+    window.addEventListener('hashchange', this._hash);
+    window.addEventListener('resize', this._resize);
+    this._key = (e) => {
+      if (e.key === '/' && !/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) {
+        e.preventDefault(); this.openAsk();
+      }
+      if (e.key === 'Escape') this.setState({ ask: { ...this.state.ask, open: false }, why: null, lead: null });
+    };
+    window.addEventListener('keydown', this._key);
+    this._resize();
+    this.load();
+  }
+  componentWillUnmount() {
+    window.removeEventListener('hashchange', this._hash);
+    window.removeEventListener('resize', this._resize);
+    window.removeEventListener('keydown', this._key);
+  }
+
+  async load() {
+    this.setState({ loading: true, error: null });
+    try {
+      const [A, res] = await Promise.all([
+        import('./lib/analytics.js'),
+        fetch('./data/dealership_data.json', { cache: 'force-cache' })
+      ]);
+      if (!res.ok) throw new Error('dealership_data.json returned HTTP ' + res.status);
+      const raw = await res.json();
+      if (!raw || !Array.isArray(raw.leads)) throw new Error('Dataset is missing a leads array.');
+      this.A = A;
+      this.model = A.buildModel(raw);
+      this.cache = {};
+      this.setState({ loading: false });
+    } catch (e) {
+      this.setState({ loading: false, error: (e && e.message) || String(e) });
+    }
+  }
+
+  /* ---- routing, URL-persisted filters ---- */
+  readHash() {
+    const h = (location.hash || '').replace(/^#\/?/, '');
+    const [path, qs] = h.split('?');
+    const seg = path.split('/').filter(Boolean);
+    const p = new URLSearchParams(qs || '');
+    let route = { screen: 'overview', branchId: '', repId: '', anchor: p.get('a') || '' };
+    if (seg[0] === 'branches') route.screen = seg[1] ? (route.branchId = seg[1], 'branch') : 'branches';
+    else if (seg[0] === 'reps' && seg[1]) { route.screen = 'rep'; route.repId = seg[1]; }
+    else if (seg[0] === 'actions') route.screen = 'actions';
+    else if (seg[0] === 'funnel') route.screen = 'funnel';
+    else if (seg[0] === 'about') route.screen = 'about';
+    const filters = { range: p.get('range') || 'all', branchId: p.get('branch') || '', repId: p.get('rep') || '' };
+    const st = { route, filters };
+    if (p.get('tier')) st.act = { ...this.state.act, tier: p.get('tier') };
+    if (p.get('scope')) { st.funScope = 'branch'; st.funScopeId = p.get('scope'); }
+    this.setState(st);
+  }
+  writeHash(route, filters) {
+    const r = route || this.state.route, f = filters || this.state.filters;
+    let path = '/' + (r.screen === 'overview' ? 'overview'
+      : r.screen === 'branch' ? 'branches/' + r.branchId
+      : r.screen === 'rep' ? 'reps/' + r.repId
+      : r.screen === 'branches' ? 'branches' : r.screen);
+    const p = new URLSearchParams();
+    if (f.range && f.range !== 'all') p.set('range', f.range);
+    if (f.branchId) p.set('branch', f.branchId);
+    if (f.repId) p.set('rep', f.repId);
+    if (r.anchor) p.set('a', r.anchor);
+    const qs = p.toString();
+    const next = '#' + path + (qs ? '?' + qs : '');
+    if (location.hash !== next) { this._skip = true; location.hash = next; }
+  }
+  go(r) {
+    const route = { screen: r.screen || 'overview', branchId: r.branchId || '', repId: r.repId || '', anchor: r.anchor || '' };
+    const st = { route, ask: { ...this.state.ask, open: false }, why: null, lead: null };
+    if (r.screen === 'actions') {
+      st.act = { ...this.state.act, tier: r.tier || '', branch: r.branchId || '', rep: r.repId || '' };
+      route.branchId = ''; route.repId = '';
+    }
+    if (r.screen === 'funnel' && (r.branchId || r.repId)) {
+      st.funScope = r.repId ? 'rep' : 'branch'; st.funScopeId = r.repId || r.branchId;
+      route.branchId = ''; route.repId = '';
+    }
+    this.setState(st, () => { this.writeHash(); window.scrollTo(0, 0); });
+  }
+  setFilter(patch) {
+    const filters = { ...this.state.filters, ...patch };
+    this.setState({ filters }, () => this.writeHash(null, filters));
+  }
+  toast(msg) {
+    this.setState({ toast: msg });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ toast: null }), 2600);
+  }
+
+  ctx(extra) {
+    const f = { ...this.state.filters, ...(extra || {}) };
+    const k = JSON.stringify(f);
+    if (!this.cache[k]) this.cache[k] = this.A.analyze(this.model, f);
+    return this.cache[k];
+  }
+
+  openAsk() { if (!this.model) return; this.setState({ ask: { ...this.state.ask, open: true } }); }
+  runAsk(q) {
+    const question = (q != null ? q : this.state.ask.q);
+    if (!question || !question.trim()) return;
+    const res = this.A.askDealerPulse(this.ctx(), question);
+    this.setState({ ask: { open: true, q: question, res } });
+  }
+  markLead(id, kind) {
+    const done = { ...this.state.done, [id]: kind };
+    this.setState({ done });
+    this.toast(kind + ' · ' + id + ' logged. This is a prototype — no CRM write.');
+  }
+  exportCsv(rows) {
+    const csv = this.A.actionsCsv(rows);
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    const a = document.createElement('a');
+    a.href = url; a.download = 'dealerpulse-actions.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    this.toast(rows.length + ' rows exported to CSV');
+  }
+
+  /* ---- shared display helpers ---- */
+  sev(s) {
+    const m = {
+      critical: { label: 'CRITICAL', color: 'oklch(0.66 0.17 27)', bg: 'oklch(0.30 0.06 27)', fg: 'oklch(0.88 0.09 27)' },
+      risk: { label: 'RISK', color: 'oklch(0.80 0.13 78)', bg: 'oklch(0.30 0.05 78)', fg: 'oklch(0.90 0.09 78)' },
+      watch: { label: 'WATCH', color: 'oklch(0.62 0.02 80)', bg: 'oklch(0.28 0.006 75)', fg: 'oklch(0.82 0.006 82)' },
+      opportunity: { label: 'OPPORTUNITY', color: 'oklch(0.75 0.13 152)', bg: 'oklch(0.28 0.05 152)', fg: 'oklch(0.86 0.10 152)' }
+    };
+    return m[s] || m.watch;
+  }
+  branchStatus(s) {
+    const m = {
+      critical: { label: 'Critical', bg: 'oklch(0.30 0.06 27)', fg: 'oklch(0.88 0.09 27)', accent: 'oklch(0.66 0.17 27)' },
+      watch: { label: 'Watch', bg: 'oklch(0.30 0.05 78)', fg: 'oklch(0.90 0.09 78)', accent: 'oklch(0.80 0.13 78)' },
+      healthy: { label: 'Healthy', bg: 'oklch(0.28 0.05 152)', fg: 'oklch(0.86 0.10 152)', accent: 'oklch(0.75 0.13 152)' },
+      onTrack: { label: 'On track', bg: 'oklch(0.27 0.006 75)', fg: 'oklch(0.80 0.006 82)', accent: 'oklch(0.45 0.008 75)' }
+    };
+    return m[s] || m.onTrack;
+  }
+  deltaOf(cur, prev, invert) {
+    if (prev == null || cur == null || !prev) return null;
+    const d = (cur - prev) / Math.abs(prev);
+    if (!isFinite(d)) return null;
+    const good = invert ? d < 0 : d > 0;
+    return {
+      text: (d > 0 ? '▲ ' : d < 0 ? '▼ ' : '') + Math.abs(Math.round(d * 100)) + '%',
+      fg: Math.abs(d) < 0.005 ? 'oklch(0.62 0.008 80)' : good ? 'oklch(0.75 0.13 152)' : 'oklch(0.72 0.15 27)'
+    };
+  }
+
+  trendChart(rows, maxRev) {
+    if (!rows.length || !maxRev) return null;
+    const pts = rows.map((r, i) => [((i + 0.5) / rows.length) * 1000, 200 - (r.revenue / maxRev) * 200]);
+    return React.createElement('svg', {
+      viewBox: '0 0 1000 200', preserveAspectRatio: 'none',
+      style: { width: '100%', height: '100%', display: 'block', overflow: 'visible' }, 'aria-hidden': 'true'
+    }, React.createElement('polyline', {
+      points: pts.map((p) => p.join(',')).join(' '), fill: 'none',
+      stroke: 'oklch(0.79 0.10 200)', strokeWidth: 2, strokeLinejoin: 'round',
+      vectorEffect: 'non-scaling-stroke'
+    }));
+  }
+
+  renderVals() {
+    const S = this.state;
+    const base = {
+      state: {
+        loading: S.loading, error: S.error, skeleton: S.skeleton,
+        onRetry: () => this.load()
+      },
+      ui: {
+        wide: S.wide && S.railOpen,
+        railW: (S.wide && S.railOpen) ? '236px' : '62px',
+        railToggle: (S.wide && S.railOpen) ? '‹ Collapse' : '›',
+        onToggleRail: () => this.setState({ railOpen: !S.railOpen, wide: !S.railOpen ? window.innerWidth > 1120 : S.wide })
+      },
+      show: { overview: false, branches: false, branch: false, rep: false, actions: false, funnel: false, about: false },
+      nav: [], head: {}, meta: {}, ask: { onOpen: () => this.openAsk() }
+    };
+    if (S.loading || S.error || !this.model) {
+      base.meta = { asOf: '31 Dec 2025', rangeText: '—', scope: '—' };
+      base.head = { title: 'Overview', subtitle: S.error ? 'Data unavailable' : 'Loading network performance', ranges: [], branches: [], range: 'all', branch: '' };
+      base.nav = this.navItems();
+      return base;
+    }
+
+    const A = this.A, ctx = this.ctx(), model = this.model;
+    const R = S.route;
+    base.show[R.screen] = true;
+    base.nav = this.navItems();
+    base.meta = {
+      asOf: model.asOfLabel, rangeText: ctx.range.label,
+      scope: model.branches.length + ' branches · ' + model.reps.length + ' reps · ' + A.fmtNum(model.leads.length) + ' leads'
+    };
+    base.head = {
+      title: this.titleFor(R, ctx),
+      subtitle: this.subtitleFor(R, ctx),
+      range: S.filters.range,
+      ranges: A.RANGE_PRESETS.map((p) => ({ value: p.key, label: p.label })),
+      branch: S.filters.branchId,
+      branches: [{ value: '', label: 'All branches' }].concat(model.branches.map((b) => ({ value: b.id, label: b.name }))),
+      onRange: (e) => this.setFilter({ range: e.target.value }),
+      onBranch: (e) => this.setFilter({ branchId: e.target.value })
+    };
+
+    if (R.screen === 'overview') base.ov = this.overviewVM(ctx);
+    if (R.screen === 'branches') base.list = this.branchesVM(ctx);
+    if (R.screen === 'branch') base.br = this.branchVM(ctx, R.branchId);
+    if (R.screen === 'rep') base.rp = this.repVM(ctx, R.repId);
+    if (R.screen === 'actions') base.act = this.actionsVM(ctx);
+    if (R.screen === 'funnel') base.fn = this.funnelVM(ctx);
+    if (R.screen === 'about') base.about = this.aboutVM(ctx);
+    base.ask = this.askVM(ctx);
+    base.why = this.whyVM(ctx);
+    base.lead = this.leadVM(ctx);
+    base.toast = S.toast;
+    return base;
+  }
+
+  kpiCard(label, value, sub, opts) {
+    const o = opts || {};
+    return {
+      label, value, sub: sub || '',
+      valueFg: o.tone === 'warn' ? 'oklch(0.86 0.11 78)' : o.tone === 'bad' ? 'oklch(0.80 0.14 27)'
+        : o.tone === 'good' ? 'oklch(0.82 0.11 152)' : 'oklch(0.96 0.004 85)',
+      delta: o.delta ? o.delta.text : null,
+      deltaFg: o.delta ? o.delta.fg : 'oklch(0.6 0.008 80)',
+      whyKey: o.why || '', hasWhy: !!o.why, whyAria: 'Why is ' + label + ' at this level?',
+      onWhy: () => this.setState({ why: o.why || null })
+    };
+  }
+
+  /* ---------- Branches list ---------- */
+  branchesVM(ctx) {
+    const A = this.A;
+    const rows = [...ctx.branchRows].sort((a, b) => b.maturedConversion - a.maturedConversion).map((b, i) => {
+      const st = this.branchStatus(b.status);
+      const leak = A.stageLeaks(b.funnel, ctx.netFunnel)[0];
+      return {
+        rank: i + 1, name: b.name, city: b.city, manager: b.managerName || '—',
+        statusLabel: st.label, statusBg: st.bg, statusFg: st.fg, accent: st.accent,
+        conversion: A.fmtPct(b.maturedConversion),
+        convBar: Math.round((b.maturedConversion / Math.max(0.001, Math.max(...ctx.branchRows.map((x) => x.maturedConversion)))) * 100) + '%',
+        convFill: b.status === 'critical' ? 'oklch(0.66 0.17 27)' : b.status === 'healthy' ? 'oklch(0.62 0.11 152)' : 'oklch(0.55 0.06 200)',
+        netBar: Math.round((ctx.netMaturedConversion / Math.max(0.001, Math.max(...ctx.branchRows.map((x) => x.maturedConversion)))) * 100) + '%',
+        vsNet: A.fmtSigned(b.convVsNetwork, (v) => (v * 100).toFixed(1) + ' pts'),
+        vsNetFg: b.convVsNetwork >= 0 ? 'oklch(0.80 0.11 152)' : 'oklch(0.80 0.13 27)',
+        leads: A.fmtNum(b.leads), units: A.fmtNum(b.units), revenue: A.fmtINR(b.revenue),
+        pipeline: A.fmtINR(b.pipelineValue), stale: b.staleCount + ' · ' + A.fmtINR(b.revenueAtRisk),
+        attainment: A.fmtPct(b.attainment, 0), pace: b.paceMonth ? A.MONTH_LABEL(b.paceMonth) + ' ' + A.fmtPct(b.pace, 0) : '—',
+        delay: A.fmtPct(b.delayRate, 0), leak: leak ? leak.label + ' ' + A.fmtPct(leak.conv, 0) + ' vs ' + A.fmtPct(leak.net, 0) : '—',
+        onClick: () => this.go({ screen: 'branch', branchId: b.id })
+      };
+    });
+    return {
+      rows,
+      baseline: [
+        { label: 'Network conversion', value: A.fmtPct(ctx.netMaturedConversion) },
+        { label: 'Units delivered', value: A.fmtNum(ctx.kpi.units) },
+        { label: 'Revenue', value: A.fmtINR(ctx.kpi.revenue) },
+        { label: 'Revenue at risk', value: A.fmtINR(ctx.kpi.revenueAtRisk) }
+      ],
+      note: 'Ranked by lead → delivery conversion on matured leads. Status is a z-test against the network baseline, not a fixed threshold.'
+    };
+  }
+
+  /* ---------- Branch detail ---------- */
+  branchVM(ctx, id) {
+    const A = this.A, S = this.state;
+    const b = ctx.branchRows.find((x) => x.id === id);
+    if (!b) return { missing: true, onBack: () => this.go({ screen: 'branches' }) };
+    const bctx = this.ctx({ branchId: id, repId: '' });
+    const st = this.branchStatus(b.status);
+    const sum = A.branchSummary(ctx, id);
+    const leaks = A.stageLeaks(b.funnel, ctx.netFunnel);
+    const leakByStage = {};
+    leaks.forEach((l) => { leakByStage[l.stage] = l; });
+
+    const cmpRows = [
+      { label: 'Lead → delivery conversion', v: b.maturedConversion, n: ctx.netMaturedConversion, f: (x) => A.fmtPct(x) },
+      { label: 'New → contacted rate', v: b.funnel[1].convFromPrev, n: ctx.netFunnel[1].convFromPrev, f: (x) => A.fmtPct(x) },
+      { label: 'Test-drive progression', v: b.funnel[2].convFromPrev, n: ctx.netFunnel[2].convFromPrev, f: (x) => A.fmtPct(x) },
+      { label: 'Negotiation → order', v: b.funnel[4].convFromPrev, n: ctx.netFunnel[4].convFromPrev, f: (x) => A.fmtPct(x) },
+      { label: 'Delivery delay rate', v: b.delayRate, n: ctx.delivery.delayRate, f: (x) => A.fmtPct(x, 0), invert: true },
+      { label: 'Median order → delivery', v: b.medianDaysToDeliver || 0, n: ctx.delivery.medianDays || 0, f: (x) => A.fmtDays(x), invert: true }
+    ].map((r) => {
+      const diff = r.v - r.n;
+      const good = r.invert ? diff < 0 : diff > 0;
+      const scale = Math.max(r.v, r.n, 0.0001);
+      return {
+        label: r.label, value: r.f(r.v), network: r.f(r.n),
+        diff: (diff > 0 ? '+' : '') + (r.f === undefined ? diff : (Math.abs(r.n) > 2 ? (diff).toFixed(1) : (diff * 100).toFixed(1) + ' pts')),
+        diffFg: Math.abs(diff) < 0.005 ? 'oklch(0.62 0.008 80)' : good ? 'oklch(0.80 0.11 152)' : 'oklch(0.80 0.13 27)',
+        bar: Math.round((r.v / scale) * 100) + '%',
+        netMark: Math.round((r.n / scale) * 100) + '%',
+        fill: Math.abs(diff) < 0.005 ? 'oklch(0.50 0.008 75)' : good ? 'oklch(0.62 0.11 152)' : 'oklch(0.68 0.14 27)'
+      };
+    });
+
+    const funnelRows = b.funnel.map((s, i) => {
+      const net = ctx.netFunnel[i];
+      const leak = leakByStage[s.stage];
+      const flagged = i > 0 && leak && leak.excessLoss >= 3 && leak.gap <= -0.08;
+      return {
+        label: s.label, count: A.fmtNum(s.count),
+        width: Math.round(s.shareOfTop * 100) + '%',
+        netWidth: Math.round(net.shareOfTop * 100) + '%',
+        conv: i === 0 ? '—' : A.fmtPct(s.convFromPrev, 0),
+        netConv: i === 0 ? '—' : A.fmtPct(net.convFromPrev, 0),
+        median: i === 0 ? '—' : A.fmtDays(s.medianDays),
+        fill: flagged ? 'oklch(0.68 0.14 27)' : 'oklch(0.55 0.06 200)',
+        flag: flagged ? 'Below baseline · ~' + Math.round(leak.excessLoss) + ' extra leads lost here' : null
+      };
+    });
+
+    const reps = ctx.reps.filter((r) => r.branchId === id).sort((a, c) => c.conversion - a.conversion).map((r, i) => ({
+      rank: i + 1, name: r.name, role: r.role,
+      leads: A.fmtNum(r.leads), conversion: A.fmtPct(r.conversion),
+      convFg: r.conversion < b.maturedConversion * 0.6 ? 'oklch(0.80 0.14 27)' : r.conversion > b.maturedConversion * 1.2 ? 'oklch(0.82 0.11 152)' : 'oklch(0.92 0.004 85)',
+      orders: A.fmtNum(r.orders), delivered: A.fmtNum(r.delivered),
+      pipeline: A.fmtINR(r.pipelineValue), stale: r.staleCount + '',
+      staleFg: r.staleCount > 2 ? 'oklch(0.86 0.11 78)' : 'oklch(0.72 0.008 80)',
+      onClick: () => this.go({ screen: 'rep', repId: r.id })
+    }));
+
+    const lost = bctx.lost;
+    const maxLost = Math.max(1, ...lost.rows.map((r) => r.count));
+    const buckets = bctx.aging.buckets;
+    const maxB = Math.max(1, ...buckets.map((x) => x.count));
+
+    return {
+      missing: false,
+      header: {
+        name: b.name, city: b.city, manager: b.managerName || '—',
+        statusLabel: st.label, statusBg: st.bg, statusFg: st.fg,
+        range: ctx.range.label, rank: 'Conversion rank ' + b.convRank + ' of ' + ctx.branchRows.length,
+        onBack: () => this.go({ screen: 'branches' })
+      },
+      kpis: [
+        this.kpiCard('Leads', A.fmtNum(b.leads), 'Created in ' + ctx.range.label.toLowerCase()),
+        this.kpiCard('Conversion', A.fmtPct(b.maturedConversion), 'Network ' + A.fmtPct(ctx.netMaturedConversion), { why: 'conversion', tone: b.status === 'critical' ? 'bad' : b.convVsNetwork > 0 ? 'good' : null }),
+        this.kpiCard('Units', A.fmtNum(b.units), 'Deliveries in range'),
+        this.kpiCard('Revenue', A.fmtINR(b.revenue), 'Recognised on delivery', { why: 'revenue' }),
+        this.kpiCard('Target attainment', A.fmtPct(b.attainment, 0), b.units + ' of ' + b.targetUnits + ' units · rank ' + b.attainmentRank, { why: 'attainment' }),
+        this.kpiCard('Pipeline value', A.fmtINR(b.pipelineValue), b.openCount + ' open leads', { why: 'pipeline' }),
+        this.kpiCard('Stale leads', b.staleCount + '', A.fmtINR(b.revenueAtRisk) + ' idle ' + A.STALE_DAYS + '+ days', { why: 'risk', tone: b.staleCount ? 'warn' : null })
+      ],
+      cmpRows, funnelRows, reps,
+      repEmpty: reps.length ? null : 'No leads assigned at this branch in the selected range.',
+      lost: {
+        total: lost.total, value: A.fmtINR(lost.value),
+        rows: lost.rows.map((r) => ({
+          reason: r.reason, count: r.count, value: A.fmtINR(r.value),
+          width: Math.round((r.count / maxLost) * 100) + '%'
+        })),
+        stages: lost.byStage.map((s) => ({ label: s.label, count: s.count })),
+        empty: lost.total ? null : 'No lost leads recorded in this range.'
+      },
+      aging: {
+        rows: buckets.map((x) => ({
+          label: x.label, count: x.count, value: A.fmtINR(x.value),
+          width: Math.round((x.count / maxB) * 100) + '%',
+          fill: x.tone === 'crit' ? 'oklch(0.66 0.17 27)' : x.tone === 'warn' ? 'oklch(0.76 0.12 78)' : 'oklch(0.52 0.05 200)'
+        })),
+        segments: buckets.filter((x) => x.count).map((x) => ({
+          width: Math.round((x.count / Math.max(1, bctx.aging.openCount)) * 100) + '%',
+          fill: x.tone === 'crit' ? 'oklch(0.66 0.17 27)' : x.tone === 'warn' ? 'oklch(0.76 0.12 78)' : 'oklch(0.52 0.05 200)',
+          title: x.count + ' leads idle ' + x.label + ' · ' + A.fmtINR(x.value)
+        })),
+        empty: bctx.aging.openCount ? null : 'No open leads at this branch — nothing ageing.',
+        summary: bctx.aging.openCount + ' open leads · ' + A.fmtINR(bctx.aging.openValue) + ' · ' + bctx.aging.staleCount + ' idle ' + A.STALE_DAYS + '+ days'
+      },
+      summary: sum ? {
+        performance: sum.performance, problem: sum.problem, opportunity: sum.opportunity, action: sum.action,
+        ctas: sum.ctas.map((c) => ({ label: c.label, onClick: () => this.go(c.route) }))
+      } : null,
+      onActions: () => this.go({ screen: 'actions', branchId: id }),
+      onFunnel: () => this.go({ screen: 'funnel', branchId: id })
+    };
+  }
+
+  /* ---------- Rep scorecard ---------- */
+  repVM(ctx, id) {
+    const A = this.A;
+    const rep = this.model.repById[id];
+    const r = ctx.reps.find((x) => x.id === id);
+    if (!rep) return { missing: true, onBack: () => this.go({ screen: 'branches' }) };
+    const branch = ctx.branchRows.find((x) => x.id === rep.branchId);
+    const inRange = (l) => l.createdAt >= ctx.range.from && l.createdAt <= ctx.range.to;
+    const repLeads = this.model.leads.filter((l) => l.repId === id && inRange(l));
+    const branchLeads = this.model.leads.filter((l) => l.branchId === rep.branchId && inRange(l));
+    const rf = A.funnel(repLeads), bf = A.funnel(branchLeads), nf = ctx.netFunnel;
+    const sum = r ? A.repSummary(ctx, id) : null;
+    const open = this.model.leads.filter((l) => l.repId === id && l.open);
+    const refs = A.priorityRefs(this.model, ctx.branchRows);
+
+    const funnelRows = rf.map((s, i) => ({
+      label: s.label, count: A.fmtNum(s.count),
+      conv: i === 0 ? '—' : A.fmtPct(s.convFromPrev, 0),
+      branchConv: i === 0 ? '—' : A.fmtPct(bf[i].convFromPrev, 0),
+      netConv: i === 0 ? '—' : A.fmtPct(nf[i].convFromPrev, 0),
+      width: Math.round(s.shareOfTop * 100) + '%',
+      branchWidth: Math.round(bf[i].shareOfTop * 100) + '%',
+      netWidth: Math.round(nf[i].shareOfTop * 100) + '%',
+      fill: i > 0 && s.convFromPrev < bf[i].convFromPrev - 0.1 ? 'oklch(0.68 0.14 27)' : 'oklch(0.55 0.06 200)'
+    }));
+
+    const cycle = rf.slice(1).map((s, i) => {
+      const rm = s.medianDays, bm = bf[i + 1].medianDays, nm = nf[i + 1].medianDays;
+      const scale = Math.max(rm || 0, bm || 0, nm || 0, 1);
+      return {
+        label: A.STAGE_LABEL[A.STAGES[i]] + ' → ' + s.label,
+        value: A.fmtDays(rm), branch: A.fmtDays(bm), network: A.fmtDays(nm),
+        width: Math.round(((rm || 0) / scale) * 100) + '%',
+        netMark: Math.round(((nm || 0) / scale) * 100) + '%',
+        fill: rm != null && nm != null && rm > nm * 1.35 ? 'oklch(0.76 0.12 78)' : 'oklch(0.55 0.06 200)',
+        n: s.n
+      };
+    });
+
+    const pipeline = open.map((l) => {
+      const p = A.priorityScore(l, refs);
+      return {
+        id: l.id, customer: l.customerName, model: l.model, stage: A.STAGE_LABEL[l.status],
+        value: A.fmtINR(l.dealValue), idle: l.idleDays, score: p.score,
+        scoreFg: p.score >= 55 ? 'oklch(0.80 0.14 27)' : p.score >= 30 ? 'oklch(0.86 0.11 78)' : 'oklch(0.74 0.008 80)',
+        onClick: () => this.setState({ lead: l.id })
+      };
+    }).sort((a, b) => b.score - a.score);
+
+    return {
+      missing: false,
+      header: {
+        name: rep.name, role: rep.roleLabel, branch: rep.branchName, joined: 'Joined ' + A.fmtDate(rep.joined + 'T00:00:00Z'),
+        onBranch: () => this.go({ screen: 'branch', branchId: rep.branchId }),
+        onBack: () => this.go({ screen: 'branch', branchId: rep.branchId })
+      },
+      kpis: r ? [
+        this.kpiCard('Leads handled', A.fmtNum(r.leads), 'Assigned in ' + ctx.range.label.toLowerCase()),
+        this.kpiCard('Lead → delivery', A.fmtPct(r.conversion), 'Branch ' + A.fmtPct(branch ? branch.maturedConversion : 0) + ' · network ' + A.fmtPct(ctx.netMaturedConversion), { tone: branch && r.conversion < branch.maturedConversion * 0.7 ? 'bad' : branch && r.conversion > branch.maturedConversion * 1.2 ? 'good' : null }),
+        this.kpiCard('Orders', A.fmtNum(r.orders), 'Reached Order Placed'),
+        this.kpiCard('Delivered', A.fmtNum(r.delivered), A.fmtINR(r.revenue) + ' recognised'),
+        this.kpiCard('Pipeline value', A.fmtINR(r.pipelineValue), r.openCount + ' open leads', { why: 'pipeline' }),
+        this.kpiCard('Stale leads', r.staleCount + '', A.fmtINR(r.staleValue) + ' idle ' + A.STALE_DAYS + '+ days', { tone: r.staleCount ? 'warn' : null })
+      ] : [],
+      empty: r ? null : 'No leads assigned to ' + rep.name + ' in the selected range. ' + (rep.role === 'branch_manager' ? 'Branch managers do not carry a personal lead book in this dataset.' : ''),
+      funnelRows, cycle, pipeline,
+      pipelineEmpty: pipeline.length ? null : 'No open leads — this book is fully worked.',
+      summary: sum,
+      onActions: () => this.go({ screen: 'actions', repId: id }),
+      onFunnel: () => this.go({ screen: 'funnel', repId: id })
+    };
+  }
+
+  /* ---------- Action Center ---------- */
+  actionsVM(ctx) {
+    const A = this.A, S = this.state, F = S.act;
+    let rows = ctx.actions.rows;
+    if (F.branch) rows = rows.filter((r) => r.branchId === F.branch);
+    if (F.rep) rows = rows.filter((r) => r.repId === F.rep);
+    if (F.stage) rows = rows.filter((r) => r.status === F.stage);
+    if (F.tier) rows = rows.filter((r) => r.tier === F.tier);
+    if (F.age) {
+      const b = A.AGING_BUCKETS.find((x) => x.key === F.age);
+      if (b) rows = rows.filter((r) => r.idleDays >= b.min && r.idleDays <= b.max);
+    }
+    if (+F.minValue) rows = rows.filter((r) => r.dealValue >= +F.minValue);
+    const sorters = {
+      priority: (a, b) => b.score - a.score,
+      value: (a, b) => b.dealValue - a.dealValue,
+      idle: (a, b) => b.idleDays - a.idleDays
+    };
+    rows = [...rows].sort(sorters[F.sort] || sorters.priority);
+
+    const tierMeta = {
+      critical: { label: 'Critical', bg: 'oklch(0.30 0.06 27)', fg: 'oklch(0.88 0.09 27)', color: 'oklch(0.66 0.17 27)' },
+      attention: { label: 'Needs attention', bg: 'oklch(0.30 0.05 78)', fg: 'oklch(0.90 0.09 78)', color: 'oklch(0.80 0.13 78)' },
+      watch: { label: 'Watch', bg: 'oklch(0.27 0.006 75)', fg: 'oklch(0.82 0.006 82)', color: 'oklch(0.55 0.008 75)' }
+    };
+    const q = ctx.actions;
+    const summary = [
+      { key: 'critical', label: 'Critical', count: q.critical.length, value: A.fmtINR(A.sum(q.critical.map((r) => r.dealValue))), hint: 'Priority ' + A.PRIORITY_TIERS.critical + '+ · work today' },
+      { key: 'attention', label: 'Needs Attention', count: q.attention.length, value: A.fmtINR(A.sum(q.attention.map((r) => r.dealValue))), hint: 'Priority ' + A.PRIORITY_TIERS.attention + '–' + (A.PRIORITY_TIERS.critical - 1) + ' · this week' },
+      { key: 'watch', label: 'Watch', count: q.watch.length, value: A.fmtINR(A.sum(q.watch.map((r) => r.dealValue))), hint: 'Priority under ' + A.PRIORITY_TIERS.attention + ' · monitor' }
+    ].map((t) => ({
+      ...t, ...tierMeta[t.key],
+      active: F.tier === t.key,
+      bgActive: F.tier === t.key ? 'oklch(0.245 0.012 200)' : 'oklch(0.212 0.006 75)',
+      onClick: () => this.setState({ act: { ...F, tier: F.tier === t.key ? '' : t.key } })
+    }));
+
+    const done = S.done;
+    return {
+      summary,
+      rows: rows.map((r) => ({
+        id: r.id, customer: r.customerName, model: r.model, branch: r.branchName, rep: r.repName,
+        stage: A.STAGE_LABEL[r.status], value: A.fmtINR(r.dealValue), idle: r.idleDays + 'd',
+        score: r.score, tierLabel: tierMeta[r.tier].label, tierBg: tierMeta[r.tier].bg, tierFg: tierMeta[r.tier].fg,
+        accent: tierMeta[r.tier].color,
+        reason: r.reason, action: r.suggestedAction,
+        doneLabel: done[r.id] || '', isDone: !!done[r.id],
+        onWhy: () => this.setState({ lead: r.id }),
+        onAssign: () => this.markLead(r.id, 'Assigned'),
+        onContact: () => this.markLead(r.id, 'Contacted'),
+        onEscalate: () => this.markLead(r.id, 'Escalated')
+      })),
+      count: rows.length, total: ctx.actions.rows.length,
+      totalValue: A.fmtINR(A.sum(rows.map((r) => r.dealValue))),
+      empty: rows.length ? null : (ctx.actions.rows.length ? 'No leads match these filters. Clear a filter to widen the queue.' : 'No stale leads in this scope — nothing to chase.'),
+      filters: {
+        branch: F.branch, rep: F.rep, stage: F.stage, age: F.age, minValue: F.minValue, sort: F.sort,
+        branches: [{ value: '', label: 'All branches' }].concat(this.model.branches.map((b) => ({ value: b.id, label: b.name }))),
+        reps: [{ value: '', label: 'All reps' }].concat(
+          this.model.reps.filter((x) => !F.branch || x.branchId === F.branch).map((x) => ({ value: x.id, label: x.name }))),
+        stages: [{ value: '', label: 'All stages' }].concat(A.OPEN_STAGES.map((s) => ({ value: s, label: A.STAGE_LABEL[s] }))),
+        ages: [{ value: '', label: 'Any age' }].concat(A.AGING_BUCKETS.map((b) => ({ value: b.key, label: 'Idle ' + b.label }))),
+        values: [
+          { value: '0', label: 'Any value' }, { value: '1000000', label: '₹10 L+' },
+          { value: '2500000', label: '₹25 L+' }, { value: '4000000', label: '₹40 L+' }
+        ],
+        sorts: [{ value: 'priority', label: 'Priority' }, { value: 'value', label: 'Deal value' }, { value: 'idle', label: 'Days idle' }],
+        onBranch: (e) => this.setState({ act: { ...F, branch: e.target.value, rep: '' } }),
+        onRep: (e) => this.setState({ act: { ...F, rep: e.target.value } }),
+        onStage: (e) => this.setState({ act: { ...F, stage: e.target.value } }),
+        onAge: (e) => this.setState({ act: { ...F, age: e.target.value } }),
+        onValue: (e) => this.setState({ act: { ...F, minValue: e.target.value } }),
+        onSort: (e) => this.setState({ act: { ...F, sort: e.target.value } }),
+        onClear: () => this.setState({ act: { branch: '', rep: '', stage: '', tier: '', age: '', minValue: '0', sort: 'priority' } }),
+        hasAny: !!(F.branch || F.rep || F.stage || F.tier || F.age || +F.minValue)
+      },
+      onExport: () => this.exportCsv(rows),
+      recs: ctx.recommendations.map((r) => ({
+        horizon: r.horizon, problem: r.problem, impact: r.impact, action: r.action,
+        evidence: r.evidence.map((e) => ({ label: e.label, value: e.value, note: e.note || '' })),
+        ctaLabel: r.cta.label, onCta: () => this.go(r.cta.route)
+      })),
+      recHeadline: this.recHeadline(ctx)
+    };
+  }
+  recHeadline(ctx) {
+    const A = this.A;
+    const top = ctx.actions.rows.filter((r) => r.status === 'order_placed' && r.idleDays >= 30);
+    if (top.length) {
+      return 'Start with the ' + top.length + ' order-placed leads worth ' + A.fmtINR(A.sum(top.map((r) => r.dealValue))) +
+        ' combined that have been inactive for more than 30 days — the revenue is already committed, only fulfilment is missing.';
+    }
+    const c = ctx.actions.critical;
+    return c.length
+      ? 'Start with the ' + c.length + ' critical leads worth ' + A.fmtINR(A.sum(c.map((r) => r.dealValue))) + ' combined.'
+      : 'Nothing critical in the queue. Keep monitoring the watch list.';
+  }
+
+  /* ---------- Funnel diagnostics ---------- */
+  funnelVM(ctx) {
+    const A = this.A, S = this.state;
+    const scope = S.funScope, sid = S.funScopeId;
+    const sctx = scope === 'network' ? this.ctx({ branchId: '', repId: '' })
+      : scope === 'branch' ? this.ctx({ branchId: sid, repId: '' })
+      : this.ctx({ branchId: '', repId: sid });
+    const net = this.ctx({ branchId: '', repId: '' });
+    const f = sctx.funnel, nf = net.netFunnel;
+    const isNet = scope === 'network';
+    const scopeName = isNet ? 'Network'
+      : scope === 'branch' ? (this.model.branchById[sid]?.name || 'Branch')
+      : (this.model.repById[sid]?.name || 'Rep');
+
+    const stages = f.map((s, i) => {
+      const n = nf[i];
+      const z = i === 0 ? 0 : A.zProportion(s.count, s.n, n.convFromPrev || 0.0001);
+      const flagged = i > 0 && s.n >= 10 && Math.abs(z) >= 2;
+      return {
+        label: s.label, count: A.fmtNum(s.count),
+        notEntry: i > 0,
+        entryNote: i === 0 ? 'Every lead enters here — ' + A.fmtNum(s.count) + ' in ' + sctx.range.label.toLowerCase() : null,
+        conv: i === 0 ? '—' : A.fmtPct(s.convFromPrev, 1),
+        netConv: i === 0 ? '—' : A.fmtPct(n.convFromPrev, 1),
+        median: i === 0 ? '—' : A.fmtDays(s.medianDays),
+        p90: i === 0 ? '—' : A.fmtDays(s.p90Days),
+        drop: i === 0 ? '—' : A.fmtNum(s.dropOff),
+        lost: i === 0 ? '—' : A.fmtNum(s.lostHere),
+        width: Math.round(s.shareOfTop * 100) + '%',
+        netWidth: Math.round(n.shareOfTop * 100) + '%',
+        z: i === 0 ? '' : z.toFixed(1),
+        flagged, flagLabel: flagged ? (z < 0 ? 'BELOW BASELINE' : 'ABOVE BASELINE') : '',
+        flagBg: z < 0 ? 'oklch(0.30 0.06 27)' : 'oklch(0.28 0.05 152)',
+        flagFg: z < 0 ? 'oklch(0.88 0.09 27)' : 'oklch(0.86 0.10 152)',
+        fill: flagged && z < 0 ? 'oklch(0.68 0.14 27)' : flagged ? 'oklch(0.62 0.11 152)' : 'oklch(0.55 0.06 200)'
+      };
+    });
+
+    const bottlenecks = [...sctx.stageDurations].filter((s) => s.n >= 5)
+      .sort((a, b) => (b.medianDays || 0) - (a.medianDays || 0))
+      .map((s) => {
+        const scale = Math.max(...sctx.stageDurations.map((x) => x.medianDays || 0), 1);
+        return {
+          label: s.label, median: A.fmtDays(s.medianDays), p90: A.fmtDays(s.p90Days),
+          conv: A.fmtPct(s.conversion, 0), drop: s.dropOff,
+          width: Math.round(((s.medianDays || 0) / scale) * 100) + '%',
+          fill: (s.medianDays || 0) > scale * 0.75 ? 'oklch(0.76 0.12 78)' : 'oklch(0.5 0.05 200)',
+          text: s.label + ' is taking ' + A.fmtDays(s.medianDays) + ' at the median, with ' + s.dropOff + ' of ' + s.n + ' leads not progressing.'
+        };
+      });
+
+    const srcMax = Math.max(0.001, ...sctx.sources.map((s) => s.conversion));
+    const sources = sctx.sources.map((s) => ({
+      label: s.label, leads: A.fmtNum(s.leads), delivered: A.fmtNum(s.delivered),
+      conv: A.fmtPct(s.conversion), revenue: A.fmtINR(s.revenue), contact: A.fmtPct(s.contactRate, 0),
+      width: Math.round((s.conversion / srcMax) * 100) + '%',
+      fill: s.conversion >= net.netMaturedConversion ? 'oklch(0.62 0.11 152)' : s.conversion < net.netMaturedConversion * 0.6 ? 'oklch(0.72 0.13 27)' : 'oklch(0.55 0.06 200)'
+    }));
+
+    const dmax = Math.max(1, ...sctx.delivery.reasons.map((r) => r.count));
+    const leaks = A.stageLeaks(f, nf, 5);
+    const worstNet = nf.slice(1).reduce((a, b) => (a.dropOff >= b.dropOff ? a : b));
+    const wi = nf.indexOf(worstNet);
+    const flaggedStages = stages.filter((s) => s.flagged);
+
+    let explanation = 'The largest network leakage is ' + A.STAGE_LABEL[A.STAGES[wi - 1]] + ' → ' + worstNet.label +
+      ', where ' + worstNet.dropOff + ' of ' + worstNet.n + ' leads stop (' + A.fmtPct(worstNet.convFromPrev, 0) + ' progress).';
+    if (!isNet && leaks[0]) {
+      explanation += ' ' + scopeName + ' is ' + (leaks[0].gap < 0 ? 'below' : 'above') + ' the baseline at ' + leaks[0].label +
+        ' — ' + A.fmtPct(leaks[0].conv, 0) + ' against ' + A.fmtPct(leaks[0].net, 0) + ', about ' + Math.abs(Math.round(leaks[0].excessLoss)) +
+        ' leads ' + (leaks[0].gap < 0 ? 'lost beyond' : 'saved against') + ' what the baseline predicts.';
+    } else {
+      const weak = net.branchRows.filter((b) => b.z <= -2).sort((a, b) => a.z - b.z)[0];
+      if (weak) {
+        const wl = A.stageLeaks(weak.funnel, nf)[0];
+        explanation += ' ' + weak.name + ' is significantly below baseline overall (' + A.fmtPct(weak.maturedConversion) +
+          ' vs ' + A.fmtPct(net.netMaturedConversion) + ')' + (wl ? ', worst at ' + wl.label + '.' : '.');
+      }
+    }
+
+    return {
+      scopeName, scope, scopeId: sid,
+      scopeOptions: [{ value: 'network', label: 'Network baseline' }]
+        .concat(this.model.branches.map((b) => ({ value: 'branch:' + b.id, label: b.name })))
+        .concat(ctx.reps.map((r) => ({ value: 'rep:' + r.id, label: r.name + ' · ' + r.branchName }))),
+      scopeValue: isNet ? 'network' : scope + ':' + sid,
+      onScope: (e) => {
+        const v = e.target.value;
+        if (v === 'network') this.setState({ funScope: 'network', funScopeId: '' });
+        else { const [t, i] = v.split(':'); this.setState({ funScope: t, funScopeId: i }); }
+      },
+      compare: !isNet,
+      stages, bottlenecks, sources,
+      flaggedNote: flaggedStages.length
+        ? flaggedStages.length + ' stage' + (flaggedStages.length > 1 ? 's' : '') + ' deviate from the network baseline beyond 2 standard errors'
+        : 'No stage deviates from the network baseline beyond 2 standard errors',
+      delivery: {
+        count: A.fmtNum(sctx.delivery.count), delayed: A.fmtNum(sctx.delivery.delayedCount),
+        rate: A.fmtPct(sctx.delivery.delayRate, 0), median: A.fmtDays(sctx.delivery.medianDays),
+        p90: A.fmtDays(sctx.delivery.p90Days),
+        rows: sctx.delivery.reasons.map((r) => ({
+          reason: r.reason, count: r.count,
+          width: Math.round((r.count / dmax) * 100) + '%',
+          share: A.fmtPct(r.count / Math.max(1, sctx.delivery.count), 0)
+        })),
+        empty: sctx.delivery.count ? null : 'No deliveries in this scope and range.'
+      },
+      explanation,
+      empty: f[0].count ? null : 'No leads in this scope and range — widen the date range or pick another entity.',
+      onActions: () => this.go({ screen: 'actions', branchId: scope === 'branch' ? sid : '', repId: scope === 'rep' ? sid : '' })
+    };
+  }
+
+  /* ---------- About ---------- */
+  aboutVM(ctx) {
+    const A = this.A;
+    return {
+      rows: [
+        { term: 'Data as of', def: this.model.asOfLabel + ' — the last event in the supplied dataset. Every "days idle" and "days ago" figure counts back from this date, not from today.' },
+        { term: 'Lead → delivery conversion', def: 'Delivered leads ÷ leads created, restricted to leads at least ' + this.model.maturityDays + ' days old (the median time from first touch to delivery). Recent leads are excluded rather than counted as failures.' },
+        { term: 'Revenue', def: 'Deal value of delivered leads, recognised on delivery date. A delayed delivery moves revenue into a later month.' },
+        { term: 'Revenue at risk', def: 'Deal value of open leads with no recorded activity for ' + A.STALE_DAYS + ' or more days — the edge of the 8–14 day aging bucket, so the headline figure and the bucket evidence always reconcile. Open means any stage before Delivered and not Lost.' },
+        { term: 'Priority score', def: 'Deal value (relative to the ₹' + Math.round((A.median(this.model.leads.map((l) => l.dealValue)) || 0) / 1e5) + ' L network median) × idle time (log-scaled) × stage weight (Order Placed counts highest) × risk multipliers for overdue close dates and weak branches. The product is then normalised against the strongest case in the open book, so scores are strictly ordered rather than clipped at a ceiling — Critical is ' + A.PRIORITY_TIERS.critical + '+, Needs Attention ' + A.PRIORITY_TIERS.attention + '+.' },
+        { term: 'Status and flags', def: 'Branch and stage flags come from a two-proportion z-test against the network baseline — nothing is hardcoded. A branch is Critical below −2.5 standard errors, Watch below −1.4.' },
+        { term: 'Target attainment', def: 'Delivered units ÷ target units. Network-wide targets total ' + A.fmtNum(A.sum(ctx.branchRows.map((b) => b.targetUnits))) + ' units against ' + A.fmtNum(ctx.kpi.units) + ' delivered, so attainment is presented with rank and monthly pace instead of being read as a score.' },
+        { term: 'AI layer', def: 'The brief, insights, recommendations and answers are generated by rules over computed analytics. No language model is called, no number is invented, and unanswerable questions return "I don\'t have enough data".' }
+      ],
+      stack: [
+        { k: 'Dataset', v: A.fmtNum(this.model.leads.length) + ' leads · ' + this.model.branches.length + ' branches · ' + this.model.reps.length + ' reps · ' + A.fmtNum(this.model.deliveries.length) + ' deliveries · ' + A.fmtNum(this.model.targets.length) + ' monthly targets' },
+        { k: 'Range', v: this.model.meta.date_range },
+        { k: 'Layers', v: 'data loader → domain model → analytics → insight engine → AI presentation → UI' },
+        { k: 'Filters', v: 'Range, branch and rep are persisted in the URL (#/branches/B3?range=quarter)' }
+      ]
+    };
+  }
+
+  /* ---------- Ask DealerPulse ---------- */
+  askVM(ctx) {
+    const A = this.A, S = this.state, res = S.ask.res;
+    return {
+      open: S.ask.open, q: S.ask.q,
+      onOpen: () => this.openAsk(),
+      onClose: () => this.setState({ ask: { ...S.ask, open: false } }),
+      onInput: (e) => this.setState({ ask: { ...S.ask, q: e.target.value } }),
+      onKey: (e) => { if (e.key === 'Enter') this.runAsk(); },
+      onSubmit: () => this.runAsk(),
+      samples: A.SAMPLE_QUESTIONS.map((q) => ({ q, onClick: () => this.runAsk(q) })),
+      hasRes: !!res,
+      res: res ? {
+        interpretation: res.interpretation, answer: res.answer,
+        unanswered: !!res.suggestions,
+        evidence: (res.evidence || []).map((e) => ({
+          label: e.label, value: e.value, baseline: e.baseline || e.note || '',
+          fg: e.bad ? 'oklch(0.84 0.12 27)' : 'oklch(0.94 0.004 85)'
+        })),
+        hasCta: !!res.cta, ctaLabel: res.cta ? res.cta.label : '',
+        onCta: () => { if (res.cta) this.go(res.cta.route); }
+      } : null
+    };
+  }
+
+  /* ---------- Why panel ---------- */
+  whyVM(ctx) {
+    const S = this.state;
+    if (!S.why) return { open: false, points: [] };
+    const w = this.A.whyExplanation(ctx, S.why);
+    return {
+      open: true, title: w.title,
+      points: w.points.map((p) => ({ text: p.text, value: p.value })),
+      ctaLabel: w.cta.label,
+      onCta: () => this.go(w.cta.route),
+      onClose: () => this.setState({ why: null })
+    };
+  }
+
+  /* ---------- Lead explanation drawer ---------- */
+  leadVM(ctx) {
+    const S = this.state, A = this.A;
+    if (!S.lead) return { open: false, drivers: [], risks: [], history: [] };
+    const l = this.model.leadById[S.lead];
+    if (!l) return { open: false, drivers: [], risks: [], history: [] };
+    const refs = A.priorityRefs(this.model, ctx.branchRows);
+    const ex = A.leadExplanation(l, refs);
+    return {
+      open: true, id: l.id, customer: l.customerName, model: l.model,
+      meta: l.branchName + ' · ' + l.repName + ' · ' + l.sourceLabel,
+      stage: A.STAGE_LABEL[l.status], value: A.fmtINR(l.dealValue),
+      idle: l.idleDays + ' days idle', score: ex.score, headline: ex.headline,
+      expected: l.expectedCloseDate ? A.fmtDate(l.expectedCloseDate) + (l.overdue ? ' · overdue by ' + l.overdueDays + ' days' : '') : '—',
+      drivers: ex.drivers.map((d) => ({ label: d.label, detail: d.detail })),
+      risks: ex.risks,
+      history: l.history.map((h) => ({
+        status: A.STAGE_LABEL[h.status] || h.status, date: A.fmtDate(h.at), note: h.note
+      })),
+      onClose: () => this.setState({ lead: null }),
+      onRep: () => this.go({ screen: 'rep', repId: l.repId }),
+      onBranch: () => this.go({ screen: 'branch', branchId: l.branchId })
+    };
+  }
+
+  navItems() {
+    const S = this.state, cur = S.route.screen;
+    const items = [
+      { key: 'overview', mark: 'OV', label: 'Overview', match: ['overview'] },
+      { key: 'branches', mark: 'BR', label: 'Branches', match: ['branches', 'branch', 'rep'] },
+      { key: 'actions', mark: 'AC', label: 'Action Center', match: ['actions'] },
+      { key: 'funnel', mark: 'FN', label: 'Funnel', match: ['funnel'] },
+      { key: 'about', mark: 'AB', label: 'About', match: ['about'] }
+    ];
+    return items.map((i) => {
+      const on = i.match.includes(cur);
+      return {
+        label: i.label, mark: i.mark, current: on ? 'page' : 'false',
+        bg: on ? 'oklch(0.265 0.012 200)' : 'transparent',
+        fg: on ? 'oklch(0.96 0.004 85)' : 'oklch(0.70 0.008 80)',
+        markFg: on ? 'oklch(0.79 0.10 200)' : 'oklch(0.50 0.008 80)',
+        onClick: () => this.go({ screen: i.key })
+      };
+    });
+  }
+  titleFor(R, ctx) {
+    if (R.screen === 'branch') return this.model.branchById[R.branchId]?.name || 'Branch';
+    if (R.screen === 'rep') return this.model.repById[R.repId]?.name || 'Rep';
+    if (R.screen === 'actions') return 'Action Center';
+    if (R.screen === 'funnel') return 'Funnel Diagnostics';
+    if (R.screen === 'branches') return 'Branches';
+    if (R.screen === 'about') return 'About DealerPulse';
+    return 'Overview';
+  }
+  subtitleFor(R, ctx) {
+    const A = this.A;
+    if (R.screen === 'actions') return 'Prioritised work that needs attention';
+    if (R.screen === 'funnel') return 'Stage volume, conversion and duration against the network baseline';
+    if (R.screen === 'rep') {
+      const r = this.model.repById[R.repId];
+      return r ? r.roleLabel + ' · ' + r.branchName : '';
+    }
+    if (R.screen === 'branch') {
+      const b = this.model.branchById[R.branchId];
+      return b ? b.city + ' · Manager ' + (b.managerName || '—') : '';
+    }
+    if (R.screen === 'branches') return this.model.branches.length + ' branches ranked on conversion';
+    if (R.screen === 'about') return 'How the numbers are computed';
+    return 'Network health for ' + ctx.range.label.toLowerCase();
+  }
+
+  overviewVM(ctx) {
+    const A = this.A, S = this.state;
+    const K = ctx.kpi;
+    const kpis = [
+      {
+        key: 'units', label: 'Units Delivered', value: A.fmtNum(K.units), whyKey: 'units',
+        sub: K.prevUnits ? 'Previous period: ' + K.prevUnits + ' units. Counted on delivery date.' : 'Counted on delivery date.',
+        delta: this.deltaOf(K.units, K.prevUnits)
+      },
+      {
+        key: 'revenue', label: 'Revenue', value: A.fmtINR(K.revenue), whyKey: 'revenue',
+        sub: 'Recognised on delivery · avg ' + A.fmtINR(K.units ? K.revenue / K.units : 0) + ' per unit',
+        delta: this.deltaOf(K.revenue, K.prevRevenue)
+      },
+      {
+        key: 'conv', label: 'Lead → Delivery Conversion', value: K.conversion == null ? '—' : A.fmtPct(K.conversion),
+        whyKey: 'conversion', sub: K.conversionNote,
+        delta: this.deltaOf(K.conversion, K.prevConversion)
+      },
+      {
+        key: 'risk', label: 'Revenue At Risk', value: A.fmtINR(K.revenueAtRisk), whyKey: 'risk',
+        sub: K.staleCount + ' open leads with no activity for ' + A.STALE_DAYS + '+ days · ' + A.fmtPct(K.pipelineValue ? K.revenueAtRisk / K.pipelineValue : 0, 0) + ' of open pipeline',
+        delta: null, tone: 'warn'
+      }
+    ].map((k) => ({
+      label: k.label, value: k.value, sub: k.sub,
+      valueFg: k.tone === 'warn' ? 'oklch(0.86 0.11 78)' : 'oklch(0.96 0.004 85)',
+      delta: k.delta ? k.delta.text : null, deltaFg: k.delta ? k.delta.fg : 'oklch(0.6 0.008 80)',
+      whyAria: 'Why is ' + k.label + ' at this level?',
+      onWhy: () => this.setState({ why: k.whyKey })
+    }));
+
+    const maxUnits = Math.max(1, ...ctx.trend.map((m) => Math.max(m.units, m.targetUnits ? 0 : 0)));
+    const maxRev = Math.max(1, ...ctx.trend.map((m) => m.revenue));
+    const maxTarget = Math.max(1, ...ctx.trend.map((m) => m.targetUnits));
+    const scaleTop = Math.max(maxUnits, 1);
+    const rows = ctx.trend.map((m, i) => ({
+      label: m.label, units: m.units, revText: A.fmtINR(m.revenue),
+      unitsPct: Math.round((m.units / scaleTop) * 100) + '%',
+      revPct: Math.round((m.revenue / maxRev) * 100) + '%',
+      targetPct: Math.min(100, Math.round((m.targetUnits / Math.max(scaleTop, maxTarget)) * 100)) + '%',
+      barFill: i === ctx.trend.length - 1 ? 'oklch(0.62 0.075 200)' : 'oklch(0.44 0.045 200)',
+      labelFg: i === ctx.trend.length - 1 ? 'oklch(0.96 0.004 85)' : 'oklch(0.78 0.008 80)',
+      tooltip: m.label + ': ' + m.units + ' units, ' + A.fmtINR(m.revenue) + ', target ' + m.targetUnits + ' units, ' + m.delayed + ' delayed'
+    }));
+
+    const sortKey = S.branchSort;
+    const sorters = {
+      conversion: (a, b) => b.maturedConversion - a.maturedConversion,
+      revenue: (a, b) => b.revenue - a.revenue,
+      units: (a, b) => b.units - a.units,
+      risk: (a, b) => b.revenueAtRisk - a.revenueAtRisk,
+      attainment: (a, b) => b.attainment - a.attainment,
+      leads: (a, b) => b.leads - a.leads
+    };
+    const branches = [...ctx.branchRows].sort(sorters[sortKey] || sorters.conversion).map((b) => {
+      const st = this.branchStatus(b.status);
+      return {
+        name: b.name, city: b.city, manager: b.managerName || '—',
+        leads: A.fmtNum(b.leads), conversion: A.fmtPct(b.maturedConversion),
+        convFg: b.status === 'critical' ? 'oklch(0.80 0.14 27)' : b.status === 'healthy' ? 'oklch(0.82 0.11 152)' : 'oklch(0.92 0.004 85)',
+        units: A.fmtNum(b.units), revenue: A.fmtINR(b.revenue),
+        attainment: A.fmtPct(b.attainment, 0), attainmentRank: b.attainmentRank,
+        risk: A.fmtINR(b.revenueAtRisk),
+        riskFg: b.revenueAtRisk > 1.5e7 ? 'oklch(0.86 0.11 78)' : 'oklch(0.82 0.008 82)',
+        statusLabel: st.label, statusBg: st.bg, statusFg: st.fg, accent: st.accent,
+        rowBg: b.status === 'critical' ? 'oklch(0.222 0.014 27)' : 'transparent',
+        stickyBg: b.status === 'critical' ? 'oklch(0.222 0.014 27)' : 'oklch(0.212 0.006 75)',
+        onClick: () => this.go({ screen: 'branch', branchId: b.id }),
+        onKey: (e) => { if (e.key === 'Enter') this.go({ screen: 'branch', branchId: b.id }); }
+      };
+    });
+
+    const leaks = A.stageLeaks(ctx.funnel, ctx.netFunnel, 1);
+    const worstDrop = ctx.funnel.slice(1).reduce((a, b) => (a.dropOff >= b.dropOff ? a : b));
+    const funnelRows = ctx.funnel.map((s, i) => ({
+      label: s.label, count: A.fmtNum(s.count),
+      width: Math.round(s.shareOfTop * 100) + '%',
+      convText: i === 0 ? '100%' : A.fmtPct(s.convFromPrev, 0) + ' · ' + A.fmtDays(s.medianDays),
+      convFg: i && s.convFromPrev < 0.7 ? 'oklch(0.86 0.11 78)' : 'oklch(0.66 0.008 80)',
+      fill: i === 0 ? 'oklch(0.42 0.03 200)' : s.stage === worstDrop.stage ? 'oklch(0.72 0.11 78)' : 'oklch(0.55 0.06 200)',
+      flag: s.stage === worstDrop.stage ? 'Largest drop-off: ' + s.dropOff + ' leads did not progress' : null
+    }));
+
+    const insights = ctx.anomalies.map((a) => {
+      const sv = this.sev(a.severity);
+      const open = !!S.openInsights[a.id];
+      return {
+        type: a.type, title: a.title, explanation: a.explanation, impact: a.impact,
+        sevLabel: sv.label, sevColor: sv.color, sevBg: sv.bg, sevFg: sv.fg,
+        evidence: a.evidence.map((e) => ({ label: e.label, value: e.value, note: e.note || '' })),
+        expanded: open, expandedAttr: open ? 'true' : 'false', chevron: open ? '−' : '+',
+        onToggle: () => this.setState({ openInsights: { ...S.openInsights, [a.id]: !open } }),
+        ctaLabel: a.cta.label, onCta: () => this.go(a.cta.route)
+      };
+    });
+
+    const brief = A.executiveBrief(ctx);
+    return {
+      brief: {
+        headline: brief.headline, action: brief.action,
+        problemLabel: brief.problemCta.label,
+        onProblem: () => this.go(brief.problemCta.route),
+        onAction: () => this.go(brief.actionCta.route),
+        findings: brief.findings.map((f) => ({
+          text: f.text, tag: f.tone === 'positive' ? 'MOMENTUM' : 'RISK',
+          dot: f.tone === 'positive' ? 'oklch(0.75 0.13 152)' : 'oklch(0.80 0.13 78)',
+          onClick: () => this.go(f.route)
+        }))
+      },
+      kpis,
+      trend: { rows, line: this.trendChart(ctx.trend, maxRev) },
+      branches,
+      branchCols: [
+        { label: 'LEADS', hint: 'Leads created in the selected range' },
+        { label: 'CONVERSION', hint: 'Matured leads that reached Delivered' },
+        { label: 'UNITS', hint: 'Deliveries in range' },
+        { label: 'REVENUE', hint: 'Deal value of delivered leads' },
+        { label: 'TARGET', hint: 'Attainment against monthly targets, with network rank' },
+        { label: 'AT RISK', hint: 'Open pipeline value idle 7+ days' },
+        { label: 'STATUS', hint: 'Conversion vs network baseline, z-tested' }
+      ],
+      branchNote: 'Click any branch for the full diagnostic',
+      branchFoot: 'Conversion excludes leads created too recently to have closed (median lead → delivery is ' + this.model.maturityDays + ' days). Target attainment is shown with its rank because targets are poorly calibrated network-wide.',
+      sort: S.branchSort,
+      sortOptions: [
+        { value: 'conversion', label: 'Conversion' }, { value: 'revenue', label: 'Revenue' },
+        { value: 'units', label: 'Units' }, { value: 'risk', label: 'Revenue at risk' },
+        { value: 'attainment', label: 'Target attainment' }, { value: 'leads', label: 'Leads' }
+      ],
+      onSort: (e) => this.setState({ branchSort: e.target.value }),
+      funnel: funnelRows,
+      funnelNote: A.fmtNum(ctx.funnel[0].count) + ' leads · ' + ctx.scopeLabel,
+      onFunnel: () => this.go({ screen: 'funnel' }),
+      insights,
+      insightNote: insights.length + ' detected patterns, ranked by severity'
+    };
+  }
+}
+
+</script>
+</body>
+</html>

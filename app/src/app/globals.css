@@ -1,0 +1,318 @@
+@import "tailwindcss";
+
+:root {
+  --bg-app: oklch(0.165 0.006 75);
+  --bg-rail: oklch(0.192 0.006 75);
+  --bg-card: oklch(0.212 0.006 75);
+  --bg-raised: oklch(0.235 0.006 75);
+  --bg-recessed: oklch(0.175 0.006 75);
+  --bg-hover: oklch(0.245 0.008 75);
+  --bg-topbar: oklch(0.178 0.006 75 / 0.92);
+  --bg-scrim: oklch(0.12 0.006 75 / 0.72);
+
+  --line-hairline: oklch(0.285 0.008 75);
+  --line-row: oklch(0.25 0.008 75);
+  --line-strong: oklch(0.38 0.008 75);
+
+  --ink-primary: oklch(0.965 0.004 85);
+  --ink-secondary: oklch(0.8 0.006 82);
+  --ink-tertiary: oklch(0.68 0.008 80);
+  --ink-muted: oklch(0.63 0.008 80);
+  --ink-faint: oklch(0.54 0.008 80);
+
+  /* Slightly richer chroma than the original 0.10/0.08 — same hue, more
+     punch on CTAs/active states so the accent doesn't read as washed-out
+     against the dark surfaces, without changing the palette's identity. */
+  --accent: oklch(0.79 0.135 200);
+  --accent-hover: oklch(0.88 0.11 200);
+  --accent-fill-text: oklch(0.17 0.02 200);
+  --accent-tint-bg: oklch(0.24 0.02 200);
+  --accent-tint-border: oklch(0.34 0.03 200);
+
+  --critical: oklch(0.66 0.17 27);
+  --critical-bg: oklch(0.30 0.06 27);
+  --critical-fg: oklch(0.88 0.09 27);
+
+  --warning: oklch(0.80 0.13 78);
+  --warning-bg: oklch(0.30 0.05 78);
+  --warning-fg: oklch(0.90 0.09 78);
+
+  --healthy: oklch(0.75 0.13 152);
+  --healthy-bg: oklch(0.28 0.05 152);
+  --healthy-fg: oklch(0.86 0.10 152);
+
+  --neutral-bg: oklch(0.27 0.006 75);
+  --neutral-fg: oklch(0.82 0.006 82);
+
+  /* AI surface — the one recurring "this panel is AI-generated" visual
+     signature (gradient tint of the accent hue). Previously hardcoded
+     independently in 5 different components (ExecutiveBrief, AISummaryCard,
+     Recommendations, CompareView, AiStartHere), one of which had quietly
+     drifted to a slightly different value — exactly the "random
+     component-specific color" pattern a design system exists to prevent. */
+  --ai-surface-from: oklch(0.225 0.016 200);
+  --ai-surface-to: oklch(0.205 0.008 200);
+
+  --bar-track: oklch(0.25 0.008 75);
+  --bar-fill: oklch(0.55 0.06 200);
+  --bar-fill-emphasis: oklch(0.62 0.075 200);
+  --bar-fill-recessive: oklch(0.44 0.045 200);
+  --bar-baseline-marker: oklch(0.85 0.006 82);
+  --row-critical-tint: oklch(0.222 0.014 27);
+}
+
+@theme inline {
+  --color-bg-app: var(--bg-app);
+  --color-bg-rail: var(--bg-rail);
+  --color-bg-card: var(--bg-card);
+  --color-bg-raised: var(--bg-raised);
+  --color-bg-recessed: var(--bg-recessed);
+  --color-bg-hover: var(--bg-hover);
+  --color-bg-topbar: var(--bg-topbar);
+  --color-bg-scrim: var(--bg-scrim);
+
+  --color-line-hairline: var(--line-hairline);
+  --color-line-row: var(--line-row);
+  --color-line-strong: var(--line-strong);
+
+  --color-ink-primary: var(--ink-primary);
+  --color-ink-secondary: var(--ink-secondary);
+  --color-ink-tertiary: var(--ink-tertiary);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-fill-text: var(--accent-fill-text);
+  --color-accent-tint-bg: var(--accent-tint-bg);
+  --color-accent-tint-border: var(--accent-tint-border);
+
+  --color-critical: var(--critical);
+  --color-critical-bg: var(--critical-bg);
+  --color-critical-fg: var(--critical-fg);
+
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-fg: var(--warning-fg);
+
+  --color-healthy: var(--healthy);
+  --color-healthy-bg: var(--healthy-bg);
+  --color-healthy-fg: var(--healthy-fg);
+
+  --color-neutral-bg: var(--neutral-bg);
+  --color-neutral-fg: var(--neutral-fg);
+
+  --color-bar-track: var(--bar-track);
+  --color-bar-fill: var(--bar-fill);
+  --color-bar-fill-emphasis: var(--bar-fill-emphasis);
+  --color-bar-fill-recessive: var(--bar-fill-recessive);
+  --color-bar-baseline-marker: var(--bar-baseline-marker);
+  --color-row-critical-tint: var(--row-critical-tint);
+
+  --font-sans: var(--font-instrument-sans);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+* {
+  border-color: var(--line-hairline);
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--bg-app);
+  color: var(--ink-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+@keyframes dpIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.dp-in {
+  animation: dpIn 0.28s ease-out;
+}
+
+@keyframes dpShim {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.7; }
+}
+.dp-shimmer {
+  animation: dpShim 1.4s ease-in-out infinite;
+}
+
+/* Staggered card/list entrance. Use with an inline --d (delay, ms) custom property:
+   <div className="dp-stagger" style={{ '--d': i * 60 + 'ms' }}> */
+.dp-stagger {
+  opacity: 0;
+  animation: dpIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: var(--d, 0ms);
+}
+
+/* DealerPulse's one AI-panel visual identity — a single class instead of
+   each AI card re-declaring its own gradient/border. Any panel whose
+   content came from the AI layer (executive brief, recommendations,
+   summaries, comparisons) uses this, nothing else. */
+.dp-ai-surface {
+  border-color: var(--accent-tint-border);
+  background-image: linear-gradient(to bottom, var(--ai-surface-from), var(--ai-surface-to));
+}
+
+/* Lift + glow on hover for clickable cards. */
+.dp-card-hover {
+  transition: transform 0.18s ease-out, box-shadow 0.18s ease-out, border-color 0.18s ease-out;
+}
+.dp-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px oklch(0.08 0.006 75 / 0.35);
+  border-color: var(--line-strong);
+}
+
+/* Subtle breathing glow on the AI mark so AI-generated panels draw the eye
+   without looping animation on the content itself (per the handoff: "nothing loops"
+   on content — this is the one deliberate exception, on the mark alone). */
+@keyframes dpGlow {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(0.79 0.10 200 / 0.55); }
+  50% { box-shadow: 0 0 0 5px oklch(0.79 0.10 200 / 0); }
+}
+.dp-ai-mark {
+  animation: dpGlow 2.4s ease-in-out infinite;
+}
+
+/* Modal/dialog scale-fade entrance (distinct from the card rise-fade). */
+@keyframes dpPop {
+  from { opacity: 0; transform: scale(0.96) translateY(4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.dp-pop {
+  animation: dpPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Drawer slide-in from the right edge. */
+@keyframes dpSlideIn {
+  from { transform: translateX(24px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.dp-slide-in {
+  animation: dpSlideIn 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Toast rise from the bottom edge. */
+@keyframes dpToast {
+  from { transform: translate(-50%, 12px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+.dp-toast {
+  animation: dpToast 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Comparison-bar grow-in, driven by a --w custom property set inline per bar. */
+@keyframes dpBarGrow {
+  from { width: 0; }
+  to { width: var(--w, 100%); }
+}
+.dp-bar-grow {
+  width: var(--w, 0%);
+  animation: dpBarGrow 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Scrim fade-in behind modals/drawers. */
+@keyframes dpScrim {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.dp-scrim {
+  animation: dpScrim 0.18s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dp-in, .dp-shimmer, .dp-stagger, .dp-card-hover, .dp-ai-mark, .dp-pop, .dp-slide-in, .dp-toast, .dp-scrim, .dp-bar-grow {
+    animation: none !important;
+    transition: none !important;
+  }
+  .dp-stagger { opacity: 1; }
+  .dp-bar-grow { width: var(--w, 100%); }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Print: reuse the same components, just swap the token values for a clean,
+   ink-cheap light printout instead of duplicating layouts as separate pages. */
+@media print {
+  :root {
+    --bg-app: #ffffff;
+    --bg-rail: #ffffff;
+    --bg-card: #ffffff;
+    --bg-raised: #f4f4f4;
+    --bg-recessed: #f7f7f7;
+    --bg-hover: #ffffff;
+    --bg-topbar: #ffffff;
+    --bg-scrim: transparent;
+
+    --line-hairline: #d5d5d5;
+    --line-row: #e2e2e2;
+    --line-strong: #b5b5b5;
+
+    --ink-primary: #111111;
+    --ink-secondary: #333333;
+    --ink-tertiary: #4a4a4a;
+    --ink-muted: #666666;
+    --ink-faint: #777777;
+
+    --accent: #0f766e;
+    --accent-hover: #0f766e;
+    --accent-fill-text: #ffffff;
+    --accent-tint-bg: #eefaf9;
+    --accent-tint-border: #b9e4e0;
+
+    --bar-track: #e5e5e5;
+    --bar-baseline-marker: #333333;
+    --row-critical-tint: #fdecea;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  /* Animations don't reliably run during print — force every element to its
+     settled end-state so staggered/faded content never prints blank. */
+  .dp-in, .dp-shimmer, .dp-stagger, .dp-card-hover, .dp-ai-mark, .dp-pop, .dp-slide-in, .dp-toast, .dp-scrim, .dp-bar-grow {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .dp-bar-grow {
+    width: var(--w, 100%) !important;
+  }
+
+  body {
+    background: #ffffff;
+  }
+
+  main {
+    max-width: none !important;
+  }
+
+  a {
+    text-decoration: none;
+  }
+}

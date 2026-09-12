@@ -1,0 +1,39 @@
+[
+  {
+    "id": "rag-escalation-sop",
+    "query": "When should a lead be escalated to the branch manager?",
+    "expectedDocument": "Lead Escalation & Delivery Recovery SOP",
+    "expectedKeywords": ["escalat", "branch manager", "8"],
+    "mode": "live_embeddings"
+  },
+  {
+    "id": "rag-conversion-definition",
+    "query": "How is lead to delivery conversion calculated?",
+    "expectedDocument": "DealerPulse Metrics Glossary",
+    "expectedKeywords": ["matured", "cohort"],
+    "mode": "live_embeddings"
+  },
+  {
+    "id": "rag-anomaly-methodology",
+    "query": "Why does DealerPulse use a z-test instead of a fixed threshold for anomalies?",
+    "expectedDocument": "Anomaly Detection Methodology",
+    "expectedKeywords": ["z-test", "sample size"],
+    "mode": "live_embeddings"
+  },
+  {
+    "id": "rag-numeric-question-should-not-use-rag",
+    "query": "What is Lakeside Toyota's conversion rate?",
+    "expectedDocument": null,
+    "expectedKeywords": [],
+    "mode": "policy_check",
+    "note": "This is a KPI question — it must be answered via get_branch_performance, not search_knowledge_base. This case checks the system prompt instructs that separation; it does not call the live model."
+  },
+  {
+    "id": "rag-combined-analytics-and-policy",
+    "query": "Why is Lakeside underperforming and what is the recommended escalation process?",
+    "expectedDocument": "Lead Escalation & Delivery Recovery SOP",
+    "expectedKeywords": ["escalat"],
+    "mode": "live_gemini",
+    "note": "Compound question — should call both get_branch_performance and search_knowledge_base per the system prompt's guidance."
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "id": "reg-actions-csv-locked-columns",
+    "description": "The ported actionsCsv() output is locked at exactly 12 columns by analytics.test.ts — the differentiation layer's new Last Activity/Risk columns must go into the UI-facing QueueTable CSV only, never into this function.",
+    "check": "actions_csv_has_12_columns",
+    "coveredByExistingTest": "src/lib/__tests__/analytics.test.ts"
+  },
+  {
+    "id": "reg-conversion-null-not-zero",
+    "description": "kpi.conversion must render as null (rendered as —) when fewer than 10 matured leads exist, never as a misleading 0%.",
+    "check": "conversion_null_below_threshold",
+    "coveredByExistingTest": "src/lib/__tests__/analytics.test.ts"
+  },
+  {
+    "id": "reg-anomalies-severity-order-preserved",
+    "description": "detectAnomalies()'s raw output (consumed by the locked test suite) must stay severity-sorted; rankAnomalies() is a display-layer wrapper that must never mutate or reorder the underlying ctx.anomalies array itself.",
+    "check": "detect_anomalies_still_severity_sorted",
+    "coveredByExistingTest": "src/lib/__tests__/analytics.test.ts + src/lib/__tests__/anomaly-ranking.test.ts"
+  },
+  {
+    "id": "reg-pdf-no-garbled-glyphs",
+    "description": "pdfkit's core Helvetica font cannot render ₹ or → — a prior bug let a raw → through in the Recommended Actions section by constructing that line outside the sanitizeReport() pass. The PDF export must never contain a literal ₹ or → byte.",
+    "check": "pdf_export_contains_no_unrenderable_glyphs"
+  },
+  {
+    "id": "reg-no-gemini-key-in-client-bundle",
+    "description": "GEMINI_API_KEY and the @google/genai SDK must never appear in .next/static (client bundle).",
+    "check": "client_bundle_has_no_gemini_key_or_sdk"
+  },
+  {
+    "id": "reg-env-example-not-gitignored",
+    "description": ".env.example must survive the blanket .env* gitignore rule so it can be committed as onboarding documentation.",
+    "check": "env_example_is_trackable"
+  },
+  {
+    "id": "reg-ask-falls-back-when-gemini-unconfigured",
+    "description": "/api/ask must return a usable deterministic answer (not an error) when GEMINI_API_KEY is unset.",
+    "check": "ask_dealerpulse_answers_without_gemini"
+  },
+  {
+    "id": "reg-forecast-never-fabricated",
+    "description": "get_forecast must return {available:false, reason:...} rather than a number when fewer than 10 matured leads exist in scope — never fabricate a forecast.",
+    "check": "forecast_unavailable_below_threshold"
+  },
+  {
+    "id": "reg-high-value-threshold-not-hardcoded",
+    "description": "The high-value-stale risk label's deal-value cutoff must be computed from the live open-lead distribution (75th percentile), never a hardcoded rupee figure.",
+    "check": "high_value_threshold_is_computed_not_constant"
+  }
+]

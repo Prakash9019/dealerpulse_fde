@@ -1,0 +1,168 @@
+[
+  {
+    "id": "kpi-network-revenue",
+    "category": "network_kpis",
+    "intent": "Network-wide revenue lookup",
+    "turns": [{ "question": "What is total network revenue, all time?", "range": "all" }],
+    "acceptableTools": ["get_network_kpis"],
+    "requiredFacts": ["network.revenue"],
+    "requiredEvidenceKeywords": ["revenue"],
+    "forbiddenClaims": ["I don't have enough data to answer that"]
+  },
+  {
+    "id": "kpi-network-units",
+    "category": "network_kpis",
+    "intent": "Network-wide delivered-units lookup",
+    "turns": [{ "question": "How many units were delivered network-wide, all time?", "range": "all" }],
+    "acceptableTools": ["get_network_kpis"],
+    "requiredFacts": ["network.units"],
+    "requiredEvidenceKeywords": [],
+    "forbiddenClaims": ["I don't have enough data to answer that"]
+  },
+  {
+    "id": "conversion-network",
+    "category": "conversion",
+    "intent": "Network-wide lead-to-delivery conversion rate",
+    "turns": [{ "question": "What is the network lead to delivery conversion rate?", "range": "all" }],
+    "acceptableTools": ["get_network_kpis"],
+    "requiredFacts": ["network.conversion"],
+    "requiredEvidenceKeywords": [],
+    "forbiddenClaims": ["I don't have enough data to answer that", "0%"]
+  },
+  {
+    "id": "branch-performance-lakeside",
+    "category": "branch",
+    "intent": "Diagnose why a specific branch is underperforming",
+    "turns": [{ "question": "Why is Lakeside Toyota underperforming?", "range": "all" }],
+    "acceptableTools": ["get_branch_performance", "get_anomalies", "get_funnel_metrics"],
+    "requiredFacts": ["branch.B3.conversion"],
+    "requiredEvidenceKeywords": ["conversion"],
+    "forbiddenClaims": ["I don't have enough data to answer that"]
+  },
+  {
+    "id": "branch-performance-downtown",
+    "category": "branch",
+    "intent": "Branch conversion + revenue lookup",
+    "turns": [{ "question": "What is Downtown Toyota's conversion rate and revenue?", "range": "all" }],
+    "acceptableTools": ["get_branch_performance"],
+    "requiredFacts": ["branch.B1.conversion"],
+    "requiredEvidenceKeywords": [],
+    "forbiddenClaims": ["I don't have enough data to answer that"]
+  },
+  {
+    "id": "rep-performance",
+    "category": "rep",
+    "intent": "Individual rep performance lookup by name",
+    "turns": [{ "question": "How is sales rep Meera Menon performing?", "range": "all" }],
+    "acceptableTools": ["get_rep_performance"],
+    "requiredFacts": ["rep.SR2.conversion"],
+    "requiredEvidenceKeywords": [],
+    "forbiddenClaims": ["I don't have enough data to answer that"]
+  },
+  {
+    "id": "branch-reps-affected",
+    "category": "branch",
+    "intent": "\"Which reps are affected\" for a branch-level problem — answerable only via the branch tool's rep breakdown, not a single named-rep lookup",
+    "turns": [{ "question": "Which reps at Lakeside Toyota have the lowest conversion?", "range": "all" }],
+    "acceptableTools": ["get_branch_performance", "get_rep_performance"],
+    "requiredFacts": ["branch.B3.conversion"],
+    "requiredEvidenceKeywords": [],
+    "forbiddenClaims": ["I don't have enough data to answer that"]
+  },
+  {
+    "id": "funnel-biggest-leak",
+    "category": "funnel",
+    "intent": "Identify the network's worst funnel drop-off stage",
+    "turns": [{ "question": "Where is the biggest leakage in the funnel, network-wide?", "range": "all" }],
+    "acceptableTools": ["get_funnel_metrics", "get_anomalies"],
+    "requiredFacts": ["funnel.worstStage.label"],
+    "requiredEvidenceKeywords": [],
+    "forbiddenClaims": ["I don't have enough data to answer that"]
+  },
+  {
+    "id": "lead-aging-stale",
+    "category": "lead_aging",
+    "intent": "Count of currently-stale leads",
+    "turns": [{ "question": "How many leads are stale (8 or more days idle) right now?", "range": "all" }],
+    "acceptableTools": ["get_lead_aging"],
+    "requiredFacts": ["aging.staleCount"],
+    "requiredEvidenceKeywords": [],
+    "forbiddenClaims": ["I don't have enough data to answer that"]
+  },
+  {
+    "id": "revenue-at-risk",
+    "category": "revenue_at_risk",
+    "intent": "Revenue exposure from idle/stale leads — answerable from either the dedicated tool or the network KPI rollup",
+    "turns": [{ "question": "How much revenue is at risk from idle leads?", "range": "all" }],
+    "acceptableTools": ["get_revenue_at_risk", "get_network_kpis"],
+    "requiredFacts": ["network.revenueAtRisk"],
+    "requiredEvidenceKeywords": [],
+    "forbiddenClaims": ["I don't have enough data to answer that"]
+  },
+  {
+    "id": "anomalies-top",
+    "category": "anomalies",
+    "intent": "Surface top-ranked anomalies network-wide",
+    "turns": [{ "question": "What are the top anomalies detected in the network right now?", "range": "all" }],
+    "acceptableTools": ["get_anomalies"],
+    "requiredFacts": ["anomaly.topSeverity"],
+    "requiredEvidenceKeywords": [],
+    "forbiddenClaims": []
+  },
+  {
+    "id": "forecast-network",
+    "category": "forecast",
+    "intent": "Pipeline-based target-attainment forecast, must not overclaim certainty",
+    "turns": [{ "question": "Based on the current pipeline, will the network hit its target?", "range": "all" }],
+    "acceptableTools": ["get_forecast"],
+    "requiredFacts": ["forecast.availability"],
+    "requiredEvidenceKeywords": [],
+    "forbiddenClaims": ["will definitely hit", "guaranteed"]
+  },
+  {
+    "id": "whatif-scenario",
+    "category": "whatif",
+    "intent": "What-if stage-improvement scenario projection",
+    "turns": [{ "question": "What happens if we improve Contacted to Test Drive conversion by 10 percentage points?", "range": "all" }],
+    "acceptableTools": ["run_scenario"],
+    "requiredFacts": ["scenario.stage2.plus10"],
+    "requiredEvidenceKeywords": [],
+    "forbiddenClaims": ["I don't have enough data to answer that"]
+  },
+  {
+    "id": "policy-escalation",
+    "category": "policy",
+    "intent": "Policy/document lookup — must route to RAG, not analytics tools",
+    "turns": [{ "question": "What is the recommended escalation process for a stale order-placed lead?", "range": "all" }],
+    "acceptableTools": ["search_knowledge_base"],
+    "requiredFacts": ["policy.escalation.mentionsBranchManager"],
+    "requiredEvidenceKeywords": [],
+    "forbiddenClaims": []
+  },
+  {
+    "id": "refusal-out-of-scope",
+    "category": "refusal",
+    "intent": "Out-of-scope question must be declined, not guessed",
+    "turns": [{ "question": "What is the CEO's favorite color?", "range": "all" }],
+    "acceptableTools": null,
+    "requiredFacts": ["refusal.expected"],
+    "requiredEvidenceKeywords": [],
+    "forbiddenClaims": []
+  },
+  {
+    "id": "multi-turn-lakeside-drilldown",
+    "category": "multi_turn",
+    "intent": "4-turn drilldown on one branch — context must persist across every turn without falling back",
+    "turns": [
+      { "question": "Why is Lakeside underperforming?", "range": "all" },
+      { "question": "Why?", "range": "all" },
+      { "question": "Which reps are affected?", "range": "all" },
+      { "question": "What should I do?", "range": "all" }
+    ],
+    "acceptableTools": ["get_branch_performance", "get_anomalies", "get_lead_aging", "get_funnel_metrics", "get_rep_performance"],
+    "requiredFacts": ["branch.B3.conversion"],
+    "requiredEvidenceKeywords": [],
+    "forbiddenClaims": ["I don't have enough data to answer that"],
+    "requiresRecommendation": true
+  }
+]

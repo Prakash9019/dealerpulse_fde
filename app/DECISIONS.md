@@ -121,12 +121,3 @@ The branch's real problem is upstream: its New → Contacted rate is the leak (5
 ### Target calibration
 
 Target attainment tops out around 15% network-wide, and that gap is roughly uniform across every branch. A uniform shortfall of that size across an entire network reads as a target-calibration problem — the targets themselves were likely set too high — rather than five branches independently underperforming. The product treats this as a calibration finding rather than ranking branches against a target nobody could actually hit.
-
-## 7. What I'd Build Next
-
-1. **Persistent AI observability and feedback** — today's call log and feedback control are in-memory only; without persistence, there's no way to look back at how the AI layer performed last week.
-2. **A golden evaluation dataset for AI answer quality** — current tests cover guardrail/fallback logic, not whether answers are actually correct against known-good references.
-3. **More rigorous PII and prompt-injection testing** — beyond the one informal live-Gemini check that exists today, this needs deliberate red-teaming before it's trusted with real customer data.
-4. **Production hardening of the optional agent service** — if the external `ai-service` tier becomes something users actually rely on, it needs a real deployment path, not just a local `uvicorn` run.
-5. **Real CRM/action integration** — Contact/Assign/Escalate would need to write somewhere real if this moved past prototype, so actions taken in the dashboard actually change downstream state.
-6. **Full accessibility/screen-reader validation** — keyboard traversal and ARIA states were checked visually, but a real assistive-technology pass hasn't been done.

@@ -61,6 +61,65 @@
   --row-critical-tint: oklch(0.222 0.014 27);
 }
 
+/* Light theme — the same warm-neutral (hue 75) + accent (hue 200) +
+   semantic-status (152/78/27) identity as the dark palette above, with
+   lightness/chroma inverted for a light surface instead of a separate
+   look. Toggled via [data-theme="light"] on <html> (see ThemeToggle.tsx);
+   dark stays the product's designed default. Every token name here mirrors
+   one above 1:1 — if you add a token to :root, add its light equivalent
+   here too. */
+:root[data-theme="light"] {
+  --bg-app: oklch(0.98 0.004 75);
+  --bg-rail: oklch(0.965 0.005 75);
+  --bg-card: oklch(1 0 0);
+  --bg-raised: oklch(0.99 0.002 75);
+  --bg-recessed: oklch(0.955 0.006 75);
+  --bg-hover: oklch(0.93 0.008 75);
+  --bg-topbar: oklch(0.98 0.004 75 / 0.92);
+  --bg-scrim: oklch(0.2 0.006 75 / 0.35);
+
+  --line-hairline: oklch(0.88 0.006 75);
+  --line-row: oklch(0.91 0.006 75);
+  --line-strong: oklch(0.72 0.008 75);
+
+  --ink-primary: oklch(0.22 0.008 75);
+  --ink-secondary: oklch(0.36 0.008 75);
+  --ink-tertiary: oklch(0.48 0.01 75);
+  --ink-muted: oklch(0.55 0.01 75);
+  --ink-faint: oklch(0.64 0.01 75);
+
+  --accent: oklch(0.52 0.12 200);
+  --accent-hover: oklch(0.45 0.12 200);
+  --accent-fill-text: oklch(0.99 0.008 200);
+  --accent-tint-bg: oklch(0.94 0.03 200);
+  --accent-tint-border: oklch(0.8 0.05 200);
+
+  --critical: oklch(0.5 0.19 27);
+  --critical-bg: oklch(0.94 0.05 27);
+  --critical-fg: oklch(0.4 0.19 27);
+
+  --warning: oklch(0.6 0.14 78);
+  --warning-bg: oklch(0.94 0.06 78);
+  --warning-fg: oklch(0.42 0.13 78);
+
+  --healthy: oklch(0.5 0.13 152);
+  --healthy-bg: oklch(0.93 0.05 152);
+  --healthy-fg: oklch(0.36 0.11 152);
+
+  --neutral-bg: oklch(0.91 0.006 75);
+  --neutral-fg: oklch(0.4 0.008 75);
+
+  --ai-surface-from: oklch(0.965 0.02 200);
+  --ai-surface-to: oklch(0.985 0.008 200);
+
+  --bar-track: oklch(0.9 0.006 75);
+  --bar-fill: oklch(0.55 0.08 200);
+  --bar-fill-emphasis: oklch(0.46 0.095 200);
+  --bar-fill-recessive: oklch(0.75 0.035 200);
+  --bar-baseline-marker: oklch(0.3 0.008 75);
+  --row-critical-tint: oklch(0.96 0.03 27);
+}
+
 @theme inline {
   --color-bg-app: var(--bg-app);
   --color-bg-rail: var(--bg-rail);
@@ -121,6 +180,10 @@ html {
   color-scheme: dark;
 }
 
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
 body {
   background: var(--bg-app);
   color: var(--ink-primary);
@@ -131,6 +194,15 @@ body {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 2px;
+}
+
+/* Ask DealerPulse composer input opts out of the global focus ring on
+   purpose — see AskDealerPulse.tsx for why. Needs equal/higher specificity
+   than the rule above since both live outside any @layer (unlayered CSS
+   always beats Tailwind's layered utility classes, so `outline-none` alone
+   can't win here). */
+.dp-ask-input:focus-visible {
+  outline: none;
 }
 
 @keyframes dpIn {

@@ -148,11 +148,13 @@ export function AskDealerPulse({ onClose }: { onClose: () => void }) {
       role="dialog"
       aria-modal="false"
       aria-label="Ask DealerPulse"
-      className="dp-pop fixed bottom-4 right-4 z-50 flex max-h-[75vh] w-full max-w-[420px] flex-col rounded-xl border border-line-hairline bg-bg-card shadow-[0_24px_60px_oklch(0.08_0.006_75_/_0.7)] sm:bottom-6 sm:right-6"
+      className="dp-pop fixed bottom-4 right-4 z-50 flex max-h-[75vh] w-full max-w-[420px] flex-col overflow-hidden rounded-[14px] border border-line-hairline bg-bg-card shadow-[0_24px_60px_oklch(0.08_0.006_75_/_0.7)] sm:bottom-6 sm:right-6"
     >
-        {/* Header: minimal title + close, not the input — the composer now
-            lives at the very bottom, like a normal chat app. */}
-        <div className="flex items-center gap-2 border-b border-line-hairline px-5 py-3">
+        {/* Header carries DealerPulse's one AI-surface identity (the same
+            gradient wash used on Executive Brief / Recommendations), so this
+            panel reads as the same product's AI feature rather than a
+            generic bolted-on chat widget. */}
+        <div className="dp-ai-surface flex items-center gap-2 border-b px-5 py-3">
           <span aria-hidden="true" className="dp-ai-mark inline-block h-3 w-3 rotate-45 rounded-[2px] bg-accent shrink-0" />
           <span className="text-[13px] font-semibold text-ink-primary">Ask DealerPulse</span>
           <button
@@ -175,10 +177,15 @@ export function AskDealerPulse({ onClose }: { onClose: () => void }) {
           )}
           {turns.map((t, ti) => (
             <div key={ti} className="dp-in space-y-3 border-b border-line-hairline pb-4 last:border-0 last:pb-0">
-              <div className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-accent">
-                Question
+              {/* The question is the user's own message — a right-aligned
+                  bubble reads as "you said this" without needing a label.
+                  The answer's position (left, unindented, below) already
+                  marks it as the reply, so it doesn't need one either — the
+                  layout carries the meaning that a repeated "QUESTION" /
+                  "ANSWER" eyebrow on every turn used to spell out. */}
+              <div className="ml-auto max-w-[85%] rounded-[10px] rounded-br-[3px] bg-bg-hover px-3 py-2 text-[13px] text-ink-primary">
+                {t.question}
               </div>
-              <div className="text-[13px] text-ink-secondary">{t.question}</div>
 
               {/* Staged reveal: Answer, then Evidence, Impact, Recommendation,
                   Sources, CTA cascade in over ~350ms rather than popping in
@@ -186,11 +193,9 @@ export function AskDealerPulse({ onClose }: { onClose: () => void }) {
                   model finished reasoning through this," without a fake
                   typing effect. dp-stagger only animates on mount, so this
                   plays once per turn, not on every re-render. */}
-              <div className="dp-stagger" style={{ "--d": "0ms" } as React.CSSProperties}>
-                <div className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-accent">
-                  Answer
-                </div>
-                <div className="mt-1.5 text-[14px] leading-relaxed text-ink-primary">{t.answer.answer}</div>
+              <div className="dp-stagger flex items-start gap-2" style={{ "--d": "0ms" } as React.CSSProperties}>
+                <span aria-hidden="true" className="dp-ai-mark mt-1.5 inline-block h-2 w-2 shrink-0 rotate-45 rounded-[1px] bg-accent" />
+                <div className="text-[14px] leading-relaxed text-ink-primary">{t.answer.answer}</div>
               </div>
 
               {t.answer.evidence.length > 0 && (
@@ -245,14 +250,13 @@ export function AskDealerPulse({ onClose }: { onClose: () => void }) {
           ))}
           {pendingQuestion && (
             <div className="dp-in space-y-3">
-              <div className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-accent">
-                Question
+              <div className="ml-auto max-w-[85%] rounded-[10px] rounded-br-[3px] bg-bg-hover px-3 py-2 text-[13px] text-ink-primary">
+                {pendingQuestion}
               </div>
-              <div className="text-[13px] text-ink-secondary">{pendingQuestion}</div>
-              <div className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-accent">
-                Answer
+              <div className="flex items-start gap-2">
+                <span aria-hidden="true" className="dp-ai-mark mt-1.5 inline-block h-2 w-2 shrink-0 rotate-45 rounded-[1px] bg-accent" />
+                <div className="dp-shimmer h-16 flex-1 rounded-[10px] bg-bg-recessed" aria-busy="true" aria-label="Thinking…" />
               </div>
-              <div className="dp-shimmer h-16 rounded-lg bg-bg-recessed" aria-busy="true" aria-label="Thinking…" />
             </div>
           )}
         </div>
@@ -296,24 +300,30 @@ export function AskDealerPulse({ onClose }: { onClose: () => void }) {
             // answered twice in a row.
             if (question.trim() && !loading) ask(question);
           }}
-          className="flex items-center gap-2 border-t border-line-hairline px-5 py-3"
+          className="border-t border-line-hairline px-5 py-3"
         >
-          <input
-            autoFocus
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            disabled={loading}
-            placeholder={loading ? "Thinking…" : "Ask anything about your dealership…"}
-            className="flex-1 bg-transparent text-[14px] text-ink-primary outline-none placeholder:text-ink-muted disabled:opacity-60"
-          />
-          <button
-            type="submit"
-            disabled={loading || !question.trim()}
-            aria-label="Send"
-            className="rounded-[7px] bg-accent px-3 py-1.5 text-[12.5px] font-semibold text-accent-fill-text disabled:opacity-40"
-          >
-            Send
-          </button>
+          {/* No boxed input here on purpose — a bare field, like the
+              command palette's search box. No focus border/ring either
+              (autofocus fires the instant this panel opens, so a boxed or
+              underlined focus style would flash immediately every time). */}
+          <div className="flex items-center gap-2">
+            <input
+              autoFocus
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              disabled={loading}
+              placeholder={loading ? "Thinking…" : "Ask anything about your dealership…"}
+              className="dp-ask-input min-w-0 flex-1 border-0 bg-transparent pb-0.5 text-[14px] text-ink-primary outline-none transition-colors placeholder:text-ink-muted disabled:opacity-60"
+            />
+            <button
+              type="submit"
+              disabled={loading || !question.trim()}
+              aria-label="Send"
+              className="rounded-[7px] bg-accent px-3 py-1.5 text-[12.5px] font-semibold text-accent-fill-text transition-transform active:scale-[0.96] disabled:opacity-40"
+            >
+              Send
+            </button>
+          </div>
         </form>
     </div>
   );

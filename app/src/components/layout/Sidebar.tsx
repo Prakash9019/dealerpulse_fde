@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSyncExternalStore } from "react";
+import { ThemeToggle } from "./ThemeToggle";
 
 const NAV = [
   { href: "/", mark: "OV", label: "Overview" },
@@ -64,7 +65,7 @@ export function Sidebar({ datasetScope }: { datasetScope: string }) {
   return (
     <nav
       aria-label="Main"
-      className={`no-print hidden md:flex w-[62px] ${expandedClass} shrink-0 flex-col overflow-hidden bg-bg-rail border-r border-line-hairline px-2 py-4 gap-1 transition-[width] duration-200 ease-out`}
+      className={`no-print hidden md:flex sticky top-0 h-screen w-[62px] ${expandedClass} shrink-0 flex-col overflow-y-auto overflow-x-hidden bg-bg-rail border-r border-line-hairline px-2 py-4 gap-1 transition-[width] duration-200 ease-out`}
     >
       <div className="flex items-center gap-2 px-1 mb-4">
         <span aria-hidden="true" className="relative inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md bg-accent">
@@ -88,7 +89,7 @@ export function Sidebar({ datasetScope }: { datasetScope: string }) {
             aria-current={active ? "page" : undefined}
             className={`relative flex items-center gap-2.5 rounded-[7px] px-[9px] py-[10px] text-[13.5px] font-medium transition-[background-color,color,transform] duration-150 active:scale-[0.97] ${
               active
-                ? "bg-[oklch(0.265_0.012_200)] text-ink-primary"
+                ? "bg-accent-tint-bg text-ink-primary"
                 : "text-ink-tertiary hover:translate-x-0.5 hover:bg-bg-hover"
             }`}
           >
@@ -127,11 +128,15 @@ export function Sidebar({ datasetScope }: { datasetScope: string }) {
         <div>{datasetScope}</div>
       </div>
 
+      <div className={collapsed ? "mt-2" : "mt-2 border-t border-line-hairline pt-2"}>
+        <ThemeToggle collapsed={collapsed} />
+      </div>
+
       <button
         type="button"
         onClick={toggle}
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        className={`mt-2 flex items-center justify-center rounded-[7px] py-1.5 text-ink-muted hover:bg-bg-hover hover:text-ink-primary ${collapsed ? "" : "hidden lg:flex"}`}
+        className={`flex items-center justify-center rounded-[7px] py-1.5 text-ink-muted hover:bg-bg-hover hover:text-ink-primary ${collapsed ? "mt-2" : "hidden lg:flex"}`}
       >
         <span aria-hidden="true" className="font-mono text-[11px]">
           {collapsed ? "»" : "«"}

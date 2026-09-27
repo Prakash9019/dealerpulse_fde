@@ -19,7 +19,9 @@ export function routeHref(route: Route, currentRange?: string | null): string {
     case 'rep': base = route.repId ? `/reps/${route.repId}` : '/branches'; break;
     case 'actions': base = '/actions'; break;
     case 'funnel': base = '/funnel'; break;
-    case 'about': base = '/about'; break;
+    case 'models': base = '/models'; break;
+    case 'leads': base = '/leads'; break;
+    case 'compare': base = '/compare'; break;
     default: base = '/';
   }
   const q = qs.toString();

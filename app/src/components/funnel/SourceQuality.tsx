@@ -11,10 +11,14 @@ export function SourceQuality({ sources, baseline }: { sources: SourcePerfRow[];
           const tone = s.conversion >= baseline ? "bg-healthy" : s.conversion < baseline * 0.6 ? "bg-critical" : "bg-bar-fill";
           return (
             <div key={s.source}>
-              <div className="mb-1 flex items-center justify-between text-[12px] text-ink-tertiary">
+              <div className="mb-1 flex flex-wrap items-center justify-between gap-x-3 text-[12px] text-ink-tertiary">
                 <span>{s.label}</span>
                 <span className="font-mono text-ink-muted">
-                  {fmtPct(s.conversion)} · {fmtNum(s.leads)} leads → {fmtNum(s.delivered)} delivered ·{" "}
+                  {fmtPct(s.conversion)}{" "}
+                  <span className="text-ink-faint" title="Conversion among leads that were actually contacted — strips out leads that were never worked at all">
+                    ({fmtPct(s.adjustedConversion, 0)} adjusted)
+                  </span>{" "}
+                  · {fmtNum(s.leads)} leads → {fmtNum(s.delivered)} delivered ·{" "}
                   {fmtINR(s.revenue)} · contact {fmtPct(s.contactRate, 0)}
                 </span>
               </div>

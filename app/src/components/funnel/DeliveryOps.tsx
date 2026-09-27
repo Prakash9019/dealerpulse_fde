@@ -1,8 +1,14 @@
 import type { DeliveryPerf } from "@/lib/analytics/deliveries";
-import { fmtDays, fmtNum, fmtPct } from "@/lib/format";
+import type { BranchRow } from "@/lib/analytics/context";
+import { fmtDays, fmtINR, fmtNum, fmtPct } from "@/lib/format";
 
-export function DeliveryOps({ delivery }: { delivery: DeliveryPerf }) {
+export function DeliveryOps({ delivery, branchRows }: { delivery: DeliveryPerf; branchRows?: BranchRow[] }) {
   const top = delivery.reasons[0]?.count || 1;
+  const withUnits = (branchRows || []).filter((b) => b.units > 0);
+  const topRevenue = withUnits.length > 1 ? [...withUnits].sort((a, b) => b.revenue - a.revenue)[0] : undefined;
+  const mostReliable = withUnits.length > 1 ? [...withUnits].sort((a, b) => a.delayRate - b.delayRate)[0] : undefined;
+  const decoupled = topRevenue && mostReliable && topRevenue.id !== mostReliable.id;
+
   return (
     <section className="dp-in rounded-[10px] border border-line-hairline bg-bg-card p-4">
       <h2 className="mb-3 text-[13.5px] font-semibold text-ink-primary">Delivery operations</h2>
@@ -12,6 +18,14 @@ export function DeliveryOps({ delivery }: { delivery: DeliveryPerf }) {
         <Stat label="Delay rate" value={fmtPct(delivery.delayRate, 0)} />
         <Stat label="Median / p90" value={`${fmtDays(delivery.medianDays)} / ${fmtDays(delivery.p90Days)}`} />
       </div>
+
+      {decoupled && topRevenue && mostReliable && (
+        <p className="mb-3 rounded-[8px] border border-line-hairline bg-bg-recessed p-2.5 text-[11.5px] leading-[1.5] text-ink-secondary">
+          <span className="font-semibold text-ink-muted">Reliability doesn&apos;t follow revenue: </span>
+          {topRevenue.name} earns the most ({fmtINR(topRevenue.revenue)}) but delays {fmtPct(topRevenue.delayRate, 0)} of deliveries — {mostReliable.name} is the most dependable at {fmtPct(mostReliable.delayRate, 0)} despite {fmtINR(mostReliable.revenue)} in revenue. The top earner isn&apos;t automatically the one to trust with a delivery date.
+        </p>
+      )}
+
       <div className="space-y-2">
         {delivery.reasons.map((r) => (
           <div key={r.reason} className="flex items-center gap-3">

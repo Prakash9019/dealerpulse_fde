@@ -27,3 +27,11 @@ export const plural = (n: number, one: string, many?: string): string =>
   n + ' ' + (n === 1 ? one : many || one + 's');
 
 export const fmtSigned = (v: number, f: (v: number) => string): string => (v > 0 ? '+' : '') + f(v);
+
+/** How many whole months old the dataset's "as of" cutoff is versus the real
+    clock right now — computed live, not a copy-pasted number that goes stale
+    the day after you write it down. */
+export function monthsBehindLive(asOf: Date, now: Date = new Date()): number {
+  const months = (now.getUTCFullYear() - asOf.getUTCFullYear()) * 12 + (now.getUTCMonth() - asOf.getUTCMonth());
+  return Math.max(0, now.getUTCDate() < asOf.getUTCDate() ? months - 1 : months);
+}

@@ -1,4 +1,4 @@
-import { STAGE_LABEL, STAGES, div, median, quantile } from '../domain/model';
+import { STAGE_LABEL, STAGES, div, median, quantile, sum } from '../domain/model';
 import type { Lead, StageKey } from '../domain/types';
 
 const DAY = 86400000;
@@ -11,6 +11,7 @@ export interface FunnelStage {
   convFromPrev: number;
   dropOff: number;
   lostHere: number;
+  lostValue: number;
   medianDays: number | null;
   p90Days: number | null;
   n: number;
@@ -22,13 +23,14 @@ export function funnel(leads: Lead[]): FunnelStage[] {
     const durs = i === 0 ? [] : leads
       .filter((l) => l.stageAt[STAGES[i - 1]] && l.stageAt[s])
       .map((l) => (l.stageAt[s]!.getTime() - l.stageAt[STAGES[i - 1]]!.getTime()) / DAY);
-    const lostHere = leads.filter((l) => l.lostFrom === STAGES[i - 1]).length;
+    const lostAtPrev = leads.filter((l) => l.lostFrom === STAGES[i - 1]);
     return {
       stage: s, label: STAGE_LABEL[s], count: counts[i],
       shareOfTop: div(counts[i], counts[0]),
       convFromPrev: i === 0 ? 1 : div(counts[i], counts[i - 1]),
       dropOff: i === 0 ? 0 : counts[i - 1] - counts[i],
-      lostHere,
+      lostHere: lostAtPrev.length,
+      lostValue: sum(lostAtPrev.map((l) => l.dealValue)),
       medianDays: i === 0 ? null : median(durs),
       p90Days: i === 0 ? null : quantile(durs, 0.9),
       n: i === 0 ? counts[0] : counts[i - 1],

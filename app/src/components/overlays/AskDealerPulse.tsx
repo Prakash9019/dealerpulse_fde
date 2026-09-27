@@ -155,8 +155,12 @@ export function AskDealerPulse({ onClose }: { onClose: () => void }) {
             panel reads as the same product's AI feature rather than a
             generic bolted-on chat widget. */}
         <div className="dp-ai-surface flex items-center gap-2 border-b px-5 py-3">
-          <span aria-hidden="true" className="dp-ai-mark inline-block h-3 w-3 rotate-45 rounded-[2px] bg-accent shrink-0" />
-          <span className="text-[13px] font-semibold text-ink-primary">Ask DealerPulse</span>
+          {/* Static mark — no looping glow here. This heading is the one
+              fixed, settled thing at the top of the panel; the pulsing
+              dp-ai-mark animation is reserved for in-transcript accents,
+              where motion signals "new content," not the title bar. */}
+          <span aria-hidden="true" className="inline-block h-3 w-3 shrink-0 rotate-45 rounded-[2px] bg-accent" />
+          <span className="text-[15px] font-bold tracking-tight text-ink-primary">Ask DealerPulse</span>
           <button
             type="button"
             onClick={onClose}
@@ -167,14 +171,24 @@ export function AskDealerPulse({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
+        {/* Empty-state prompt lives outside the scrollable transcript, in its
+            own static block — it's the panel's only content before a first
+            question is asked, so it must never itself be inside a scrolling
+            container (that's what let a spurious scrollbar render right
+            through this text). Bold and a size up from the transcript's own
+            body text, so it reads as an instruction, not another line of
+            copy at the same weight as the suggestion chips below it. */}
+        {turns.length === 0 && !loading && (
+          <p className="px-5 pt-4 text-[13px] font-semibold text-ink-primary">
+            Ask about performance, pipeline, risk or opportunity.
+          </p>
+        )}
+
         {/* Scrollable transcript — grows upward, oldest turn first, just
-            like any chat history. */}
+            like any chat history. Only mounted once there's something to
+            scroll, so an empty panel can never grow a scrollbar. */}
+        {(turns.length > 0 || loading) && (
         <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-4">
-          {turns.length === 0 && !loading && (
-            <p className="text-[11.5px] text-ink-muted">
-              Ask about performance, pipeline, risk or opportunity.
-            </p>
-          )}
           {turns.map((t, ti) => (
             <div key={ti} className="dp-in space-y-3 border-b border-line-hairline pb-4 last:border-0 last:pb-0">
               {/* The question is the user's own message — a right-aligned
@@ -260,6 +274,7 @@ export function AskDealerPulse({ onClose }: { onClose: () => void }) {
             </div>
           )}
         </div>
+        )}
 
         {/* Suggestions row — sits directly above the composer, at the
             bottom of the panel, not scattered inside the transcript. Shows

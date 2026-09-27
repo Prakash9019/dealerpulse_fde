@@ -57,6 +57,12 @@ export interface SourcePerfRow {
   leads: number;
   delivered: number;
   conversion: number;
+  /** Conversion among leads that were actually contacted — strips out the
+      "never even worked" leads so a low headline number can be diagnosed as
+      either a lead-quality problem (both numbers low) or a contact-process
+      failure (headline low, adjusted much higher). */
+  adjustedConversion: number;
+  contacted: number;
   revenue: number;
   contactRate: number;
 }
@@ -66,11 +72,14 @@ export function sourcePerf(leads: Lead[]): SourcePerfRow[] {
   return keys.map((s) => {
     const ls = leads.filter((l) => l.source === s);
     const del = ls.filter((l) => l.status === 'delivered');
+    const contacted = ls.filter((l) => 'contacted' in l.stageAt);
     return {
       source: s, label: SOURCE_LABEL[s] || s, leads: ls.length,
       delivered: del.length, conversion: div(del.length, ls.length),
+      adjustedConversion: div(del.length, contacted.length),
+      contacted: contacted.length,
       revenue: sum(del.map((l) => l.dealValue)),
-      contactRate: div(ls.filter((l) => 'contacted' in l.stageAt).length, ls.length),
+      contactRate: div(contacted.length, ls.length),
     };
   }).sort((a, b) => b.conversion - a.conversion);
 }

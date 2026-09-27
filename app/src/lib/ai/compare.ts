@@ -3,6 +3,7 @@
    analytics, just a diff and a sentence naming the widest funnel-stage gap. */
 import type { BranchRow, Context } from '../analytics/context';
 import type { RepRow } from '../analytics/reps';
+import { div } from '../domain/model';
 import { fmtINR, fmtNum, fmtPct, fmtSigned } from '../format';
 
 export interface CompareMetric {
@@ -87,6 +88,7 @@ function networkAsRepRow(ctx: Context): RepRow {
     orders: ctx.allScoped.filter((l) => l.reached('order_placed')).length,
     delivered: ctx.kpi.units,
     conversion: ctx.netMaturedConversion,
+    adjustedConversion: div(ctx.kpi.units, ctx.allScoped.filter((l) => l.reached('contacted')).length),
     pipelineValue: ctx.kpi.pipelineValue,
     revenue: ctx.kpi.revenue,
     openCount: ctx.openLeads.length,

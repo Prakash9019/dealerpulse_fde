@@ -24,6 +24,7 @@ export default async function RepLeaderboardPage({
     branchName: r.branchName ?? "—",
     leads: r.leads,
     conversion: r.conversion,
+    adjustedConversion: r.adjustedConversion,
     orders: r.orders,
     delivered: r.delivered,
     revenue: r.revenue,

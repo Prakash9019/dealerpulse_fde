@@ -1,4 +1,4 @@
-import { MONTH_LABEL, STAGE_LABEL, STALE_DAYS, div, sum } from '../domain/model';
+import { MIN_RATED_LEADS, MONTH_LABEL, STAGE_LABEL, STALE_DAYS, div, sum } from '../domain/model';
 import { fmtDays, fmtINR, fmtPct, fmtSigned, plural } from '../format';
 import type { Lead, Route } from '../domain/types';
 import { funnel, stageLeaks } from '../analytics/funnel';
@@ -158,8 +158,12 @@ export function repSummary(ctx: Context, repId: string): RepSummary | null {
   const worst = [...stageGaps].sort((a, b) => (a.conv - a.branch) - (b.conv - b.branch))[0];
   const strongest = [...stageGaps].sort((a, b) => (b.conv - b.branch) - (a.conv - a.branch))[0];
   const parts: string[] = [];
-  parts.push('Conversion is ' + fmtPct(r.conversion) + ', ' +
-    (gap >= 0.02 ? 'above' : gap <= -0.02 ? 'below' : 'in line with') + ' the ' + fmtPct(branch ? branch.maturedConversion : 0) + ' branch average');
+  if (r.leads < MIN_RATED_LEADS) {
+    parts.push(r.leads + ' assigned lead' + (r.leads === 1 ? '' : 's') + ' is too thin a book to rate conversion against the branch average');
+  } else {
+    parts.push('Conversion is ' + fmtPct(r.conversion) + ', ' +
+      (gap >= 0.02 ? 'above' : gap <= -0.02 ? 'below' : 'in line with') + ' the ' + fmtPct(branch ? branch.maturedConversion : 0) + ' branch average');
+  }
   if (worst && worst.conv < worst.branch - 0.05) parts.push('the widest gap is at ' + worst.label + ' (' + fmtPct(worst.conv) + ' vs branch ' + fmtPct(worst.branch) + ')');
   if (neverContacted) parts.push(neverContacted + ' of ' + leads.length + ' assigned leads have no recorded contact event');
   else if (notPastContacted) parts.push(notPastContacted + ' leads stopped at Contacted');
@@ -190,6 +194,32 @@ export interface LeadExplanationResult {
 }
 
 export function leadExplanation(lead: Lead, refs: PriorityRefs): LeadExplanationResult {
+  // Priority scoring answers "what should I work next" — meaningless for a lead
+  // that's already closed, where idleDays is just time-since-close, not neglect.
+  if (lead.status === 'delivered') {
+    return {
+      score: 0,
+      headline: 'Delivered' + (lead.delivery ? ', ' + lead.delivery.daysToDeliver + ' days from order to delivery' : '') + ' — no further action needed.',
+      drivers: [
+        { label: 'Deal value', detail: fmtINR(lead.dealValue) + ' recognised on delivery', weight: 0 },
+        ...(lead.delivery?.delayReason ? [{ label: 'Delivery', detail: 'Delayed — ' + lead.delivery.delayReason, weight: 0 }] : []),
+      ],
+      risks: [],
+      businessImpact: fmtINR(lead.dealValue) + ' in recognised revenue.',
+    };
+  }
+  if (lead.status === 'lost') {
+    return {
+      score: 0,
+      headline: 'Lost from ' + STAGE_LABEL[lead.lostFrom || 'new'] + (lead.lostReason ? ' — ' + lead.lostReason : ' — no reason recorded'),
+      drivers: [
+        { label: 'Deal value', detail: fmtINR(lead.dealValue) + ' lost', weight: 0 },
+        { label: 'Stage reached', detail: STAGE_LABEL[lead.lostFrom || 'new'], weight: 0 },
+      ],
+      risks: [],
+      businessImpact: fmtINR(lead.dealValue) + ' in pipeline value did not convert.',
+    };
+  }
   const p = priorityScore(lead, refs);
   const drivers: LeadDriver[] = [
     { label: 'Deal value', detail: fmtINR(lead.dealValue) + (lead.dealValue > refs.medianDealValue ? ' — above the ' + fmtINR(refs.medianDealValue) + ' network median' : ' — below the network median'), weight: p.valueF },

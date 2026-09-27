@@ -65,4 +65,15 @@ Because the core product (KPIs, drill-down, action queue) works with zero LLM ca
 
 ## 7. What was deliberately deferred (see `ARCHITECTURE.md` and `app/DECISIONS.md`)
 
-Persistent (non-in-memory) storage for AI observability/feedback, a golden-dataset eval harness for AI answer quality, a full screen-reader accessibility pass, and a production deployment path for the optional `ai-service` were all explicitly named as "next" rather than silently dropped — see `app/DECISIONS.md` for the as-shipped version of this list.
+Persistent (non-in-memory) storage for AI observability/feedback, a full screen-reader accessibility pass, and a production deployment path for the optional `ai-service` were all explicitly named as "next" rather than silently dropped — see `app/DECISIONS.md` for the as-shipped version of this list. (A golden-dataset eval harness for AI answer quality was originally deferred too, then built in a later pass — `app/evals/` — see §8 below.)
+
+## 8. Second pass: benchmark against a reference submission, then close the gap
+
+Once the app was deployed, it was benchmarked directly against another candidate's submission for the same assignment/dataset (`GAP_ANALYSIS_VS_REFERENCE.md` has the full comparison). Both apps read the exact same `dealership_data.json`, so every difference found was a **presentation/analysis choice**, not a data gap — which made this a cheap, high-signal way to find blind spots the first pass had missed. Four real gaps were found and closed:
+
+1. **Test drive as a hard gate, not a soft funnel stage** — `lib/insights/testDriveGate.ts` states, as an absolute (0 delivered), that leads reaching Contacted but never Test Drive have essentially no path to closing. A hard boundary is a stronger, more falsifiable claim than "conversion is low here," and the funnel code already had every field needed to derive it.
+2. **A dedicated Demand page** (`/models`, `lib/analytics/models.ts`) — the dataset's `model_interested` field wasn't screen-grouped anywhere; ranking by lead count alone hides that a model's share of leads and its share of delivered revenue can diverge sharply.
+3. **A raw, filterable Leads page** (`/leads`, `components/leads/LeadsTable.tsx`) — Action Center is a scored worklist of *open* leads by design; there was no self-serve way to browse every lead regardless of outcome (lost/delivered included) with cohort quick-filters.
+4. **Staleness framing on the "Data as of" badge** (`monthsBehindLive()`, feeding `model.asOfLabel`) — pre-empts the obvious "why does the recent data look empty" question a reviewer would otherwise have to ask.
+
+The same rule from §2 applied throughout this pass: nothing above required a new field in the dataset or a rebuild of the analytics/insight pipeline — each was additive, derived from data the model already computed. One gap was found and *deliberately not closed* this round — making revenue-per-lead the primary ranking metric on Branches/Reps/Sources (currently conversion %) — because it's a bigger re-ranking decision than the rest of the list, not a quick addition; see `GAP_ANALYSIS_VS_REFERENCE.md` §8 and `MASTER_INTERVIEW_PREP.md` for the full reasoning.

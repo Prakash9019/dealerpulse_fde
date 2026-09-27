@@ -121,11 +121,12 @@ No question/answer text is ever stored here — it's operational metrics only.
 | Action Center | `/actions` | Priority-ranked lead queue — the actionable-insight surface, not another chart |
 | Funnel Diagnostics | `/funnel` | Stage-by-stage leak analysis |
 | Compare | `/compare` | Branch-vs-network, rep-vs-branch comparison modes |
-| Weekly | `/weekly` | Executive report view (same data as PDF/XLSX export) |
-| Docs | `/docs` | RAG search over reference docs |
-| About | `/about` | Product/methodology explainer |
+| Demand | `/models` | Per-model lead volume vs. revenue vs. test-drive rate — added after benchmarking against a reference submission (see `GAP_ANALYSIS_VS_REFERENCE.md`) |
+| Leads | `/leads` | Every lead regardless of outcome, with cohort quick-filters (self-serve, not scored — Action Center is the scored worklist of open leads) |
 | Welcome | `/welcome` | Marketing/landing page |
 | AI Health (internal) | `/ai-health` | Ops diagnostics, see §4 |
+
+`/weekly`, `/docs`, and `/about` were removed as standalone nav tabs in a later cleanup pass — none were requested by the assignment brief, and they diluted the "understand everything at a glance" premise (see `app/DECISIONS.md` §3). The capabilities stayed: PDF/XLSX export still runs off `buildExecutiveReport()` from Overview's export buttons, and RAG retrieval still backs Ask DealerPulse's answers to policy/process questions.
 
 ### Analytics/insight engine (`app/src/lib/analytics`, `app/src/lib/insights`)
 
@@ -136,7 +137,7 @@ Funnel, cohort-matured conversion, aging buckets, target attainment, rep perform
 - **Executive brief** — auto-generated narrative summary on Overview
 - **"Why?" explanations** — grounded, per-KPI explanations (`WhyButton`)
 - **Ask DealerPulse** — natural-language Q&A, three-tier fallback: optional external agent service → in-process Gemini → deterministic rule-based router (`app/src/lib/ai/questionRouter.ts`). Out-of-scope questions always get exactly *"I don't have enough data to answer that."* — never a guessed answer.
-- **RAG document search** (`/docs`) — embedding-similarity retrieval over `app/content/docs/*.md` (escalation SOP, metrics glossary, anomaly methodology)
+- **RAG document search** — embedding-similarity retrieval over `app/content/docs/*.md` (escalation SOP, metrics glossary, anomaly methodology), backing Ask DealerPulse's answers to policy/process questions (there was previously a dedicated `/docs` browsing tab for this; it was removed, the retrieval itself stayed — see the screens table above)
 
 ### Exports (`app/src/lib/export`)
 
@@ -167,8 +168,10 @@ Run `npm run dev` in `app/` first, then walk through this with the browser open 
 - [ ] `/actions` (Action Center) — priority queue is sorted, filtering by branch/rep doesn't require a server round-trip (should feel instant), try Contact/Assign/Escalate on a lead — confirm it updates optimistically but **does not survive a page refresh** (expected, it's local state only, per §4)
 - [ ] `/funnel` — stage leaks are ranked; for Lakeside Toyota specifically, the leak should show at **New → Contacted**, not test-drive/negotiation (a known data finding, see `DECISIONS.md` §6)
 - [ ] `/compare` — branch-vs-network and rep-vs-branch modes both render
-- [ ] `/weekly` — executive report view matches the exported PDF (see export check below)
-- [ ] Export buttons: download CSV, PDF, and XLSX — open each and confirm the numbers match the on-screen Weekly report
+- [ ] `/models` (Demand) — model rows sort by revenue; the lead-share-vs-revenue-share callout only appears when a real mismatch exists
+- [ ] `/leads` — cohort quick-filter chips (Never contacted / No test drive / Stuck orders / Cold 7+ days / Lost / Delivered) each show a live count and filter the table; changing the range picker does **not** change the row count (deliberately not time-boxed, see `ARCHITECTURE.md` §4)
+- [ ] `/funnel` — the test-drive gate card appears above the stage list when any leads are stuck at Contacted, and states "0 of them ever delivered" (or the true count) rather than a percentage
+- [ ] Export buttons (on Overview): download CSV, PDF, and XLSX — open each and confirm the numbers match what's on screen
 
 ### AI layer — without Gemini configured (`GEMINI_API_KEY` unset)
 
@@ -188,7 +191,8 @@ Run `npm run dev` in `app/` first, then walk through this with the browser open 
 
 ### RAG document search
 
-- [ ] `/docs` — search for a term from `app/content/docs/escalation-sop.md`, `metrics-glossary.md`, or `anomaly-methodology.md` — result should retrieve the relevant doc/section, not just keyword-match
+- [ ] Ask DealerPulse a policy/process question sourced from one of `app/content/docs/escalation-sop.md`, `metrics-glossary.md`, or `anomaly-methodology.md` (e.g. "what's the escalation process for a stale order?") — the answer should retrieve and ground on the relevant doc/section, not just keyword-match or answer from general knowledge
+- [ ] `npm run eval` — the `rag_cases.json` checks specifically verify retrieval returns the correct doc/section (requires `GEMINI_API_KEY`; otherwise reported SKIPPED, not a false pass)
 
 ### Optional external AI service (only if you started it per §3)
 

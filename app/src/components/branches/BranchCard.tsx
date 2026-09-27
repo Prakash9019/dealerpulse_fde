@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import type { BranchRow } from "@/lib/analytics/context";
 import type { StageLeak } from "@/lib/analytics/funnel";
+import { MIN_RATED_LEADS } from "@/lib/domain/model";
 import { fmtINR, fmtNum, fmtPct, fmtSigned } from "@/lib/format";
 import { BaselineBar } from "../ui/BaselineBar";
 import { StatusPill } from "../ui/StatusPill";
@@ -49,21 +50,34 @@ export function BranchCard({
         </div>
         <StatusPill status={b.status} />
         <div className="ml-auto text-right">
-          <div className="font-mono text-[17px] text-ink-primary">{fmtPct(b.maturedConversion)}</div>
-          <div className={`text-[11px] ${b.convVsNetwork >= 0 ? "text-healthy" : "text-critical"}`}>
-            {fmtSigned(b.convVsNetwork * 100, (v) => `${v.toFixed(1)} pts`)} vs network
-          </div>
+          {b.maturedN >= MIN_RATED_LEADS ? (
+            <>
+              <div className="font-mono text-[17px] text-ink-primary">{fmtPct(b.maturedConversion)}</div>
+              <div className={`text-[11px] ${b.convVsNetwork >= 0 ? "text-healthy" : "text-critical"}`}>
+                {fmtSigned(b.convVsNetwork * 100, (v) => `${v.toFixed(1)} pts`)} vs network
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="font-mono text-[17px] text-ink-muted">—</div>
+              <div className="text-[11px] text-ink-muted" title={`Only ${b.maturedN} matured lead(s) in range — under ${MIN_RATED_LEADS}, not enough to rate`}>
+                Not enough matured leads
+              </div>
+            </>
+          )}
         </div>
       </div>
 
-      <div className="mt-3">
-        <BaselineBar
-          value={b.maturedConversion}
-          baseline={netConversion}
-          max={Math.max(0.6, netConversion * 1.5)}
-          tone={b.status === "critical" ? "critical" : "default"}
-        />
-      </div>
+      {b.maturedN >= MIN_RATED_LEADS && (
+        <div className="mt-3">
+          <BaselineBar
+            value={b.maturedConversion}
+            baseline={netConversion}
+            max={Math.max(0.6, netConversion * 1.5)}
+            tone={b.status === "critical" ? "critical" : "default"}
+          />
+        </div>
+      )}
 
       <div className="mt-3 grid grid-cols-2 gap-2 text-[11.5px] sm:grid-cols-4 lg:grid-cols-7">
         <Stat label="Leads" value={fmtNum(b.leads)} />
@@ -71,7 +85,11 @@ export function BranchCard({
         <Stat label="Revenue" value={fmtINR(b.revenue)} />
         <Stat label="Pipeline" value={fmtINR(b.pipelineValue)} />
         <Stat label="Stale" value={fmtNum(b.staleCount)} />
-        <Stat label="Target" value={fmtPct(b.attainment, 0)} />
+        <Stat
+          label="Target"
+          value={fmtPct(b.attainment, 0)}
+          sub={`rank ${b.attainmentRank} · pacing ${fmtPct(b.pace, 0)} last mo`}
+        />
         <Stat label="Delay rate" value={fmtPct(b.delayRate, 0)} />
       </div>
 
@@ -87,11 +105,12 @@ export function BranchCard({
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div>
       <div className="text-ink-muted">{label}</div>
       <div className="font-mono text-ink-primary">{value}</div>
+      {sub && <div className="text-[10px] text-ink-muted">{sub}</div>}
     </div>
   );
 }

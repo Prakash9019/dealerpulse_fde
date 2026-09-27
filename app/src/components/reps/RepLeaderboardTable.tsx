@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { fmtINR, fmtNum, fmtPct } from "@/lib/format";
+import { MIN_RATED_LEADS } from "@/lib/domain/model";
 import { Sparkline } from "../ui/Sparkline";
 import { HoverBlurb } from "../ui/HoverBlurb";
 import { Select } from "../ui/Select";
@@ -15,6 +16,7 @@ export interface LeaderboardRow {
   branchName: string;
   leads: number;
   conversion: number;
+  adjustedConversion: number;
   orders: number;
   delivered: number;
   revenue: number;
@@ -46,9 +48,17 @@ export function RepLeaderboardTable({
 
   const filtered = useMemo(() => {
     const list = branchFilter ? rows.filter((r) => r.branchId === branchFilter) : rows;
-    return [...list].sort((a, b) =>
-      sort === "revenue" ? b.revenue - a.revenue : sort === "delivered" ? b.delivered - a.delivered : b.conversion - a.conversion,
-    );
+    return [...list].sort((a, b) => {
+      if (sort === "revenue") return b.revenue - a.revenue;
+      if (sort === "delivered") return b.delivered - a.delivered;
+      // Conversion sort: a rep under the rated-sample floor can't out-rank a
+      // rated one on a lucky/unlucky handful of leads, even though its raw
+      // conversion number might look higher or lower.
+      const aRated = a.leads >= MIN_RATED_LEADS;
+      const bRated = b.leads >= MIN_RATED_LEADS;
+      if (aRated !== bRated) return aRated ? -1 : 1;
+      return b.conversion - a.conversion;
+    });
   }, [rows, branchFilter, sort]);
 
   return (
@@ -74,12 +84,11 @@ export function RepLeaderboardTable({
       </div>
 
       <div className="dp-in overflow-x-auto rounded-[10px] border border-line-hairline">
-        <table className="w-full min-w-[920px] text-[12.5px]">
+        <table className="w-full min-w-[800px] text-[12.5px]">
           <thead className="bg-bg-rail text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-muted">
             <tr>
               <th className="sticky left-0 bg-bg-rail px-3 py-2.5 text-left">Rank</th>
               <th className="px-3 py-2.5 text-left">Rep</th>
-              <th className="px-3 py-2.5 text-left">Branch</th>
               <th className="px-3 py-2.5 text-right">Leads</th>
               <th className="px-3 py-2.5 text-right">Conversion</th>
               <th className="px-3 py-2.5 text-right" title="Monthly units delivered, this period">Trend</th>
@@ -99,19 +108,31 @@ export function RepLeaderboardTable({
                 className="cursor-pointer border-t border-line-row hover:bg-bg-hover"
               >
                 <td className="sticky left-0 bg-bg-card px-3 py-2.5 font-mono text-ink-muted">
-                  {sort === "conversion" ? r.networkRank : i + 1}
+                  {sort === "conversion" ? (r.leads >= MIN_RATED_LEADS ? r.networkRank : "—") : i + 1}
                 </td>
                 <td className="px-3 py-2.5">
                   <HoverBlurb text={blurbs[r.id] ?? ""}>
                     <div>
                       <div className="font-medium text-ink-primary">{r.name}</div>
-                      <div className="text-[10.5px] text-ink-muted">{r.role}</div>
+                      <div className="text-[10.5px] text-ink-muted">
+                        {r.role} · {r.branchName}
+                      </div>
                     </div>
                   </HoverBlurb>
                 </td>
-                <td className="px-3 py-2.5 text-ink-tertiary">{r.branchName}</td>
                 <td className="px-3 py-2.5 text-right font-mono">{fmtNum(r.leads)}</td>
-                <td className="px-3 py-2.5 text-right font-mono">{fmtPct(r.conversion)}</td>
+                <td
+                  className="px-3 py-2.5 text-right font-mono"
+                  title={r.leads >= MIN_RATED_LEADS ? `${fmtPct(r.adjustedConversion, 0)} adjusted — among contacted leads only` : undefined}
+                >
+                  {r.leads >= MIN_RATED_LEADS ? (
+                    fmtPct(r.conversion)
+                  ) : (
+                    <span title={`Under ${MIN_RATED_LEADS} leads — not enough volume to rate`} className="text-ink-muted">
+                      Not rated
+                    </span>
+                  )}
+                </td>
                 <td className="px-3 py-2.5 text-right">
                   <div className="flex justify-end">
                     <Sparkline values={sparklines[r.id] ?? []} />

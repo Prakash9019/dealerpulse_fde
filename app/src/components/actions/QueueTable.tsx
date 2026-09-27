@@ -260,7 +260,7 @@ export function QueueTable({
             </thead>
             <tbody>
               {sorted.map((r) => (
-                <tr key={r.id} className="border-t border-line-row hover:bg-bg-hover">
+                <tr key={r.id} className="border-t border-line-row align-top hover:bg-bg-hover">
                   <td className="px-3 py-2.5">
                     {!done[r.id] && (
                       <input
@@ -302,11 +302,11 @@ export function QueueTable({
                     </span>
                   </td>
                   <td className="max-w-[220px] px-3 py-2.5 text-[11.5px] text-ink-tertiary">
-                    {r.reason}{" "}
+                    <p className="line-clamp-2 leading-[1.4]">{r.reason}</p>
                     <button
                       type="button"
                       onClick={() => setOpenId(r.id)}
-                      className="underline decoration-dotted"
+                      className="mt-0.5 whitespace-nowrap underline decoration-dotted"
                     >
                       Why is this high priority?
                     </button>

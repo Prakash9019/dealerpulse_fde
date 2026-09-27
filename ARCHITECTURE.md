@@ -36,8 +36,11 @@ lib/ai/*                       executive brief, why-explanations, summaries,
         ▼
 App Router Server Components    Overview / Branches / Branch Detail / Rep
 + Route Handlers                Scorecard / Action Center / Funnel Diagnostics
-                                / About (+ Compare, Weekly, Docs)
+                                / Compare / Demand / Leads
 ```
+
+(Weekly, Docs, and About were built beyond the handoff's minimum, then later removed as
+standalone tabs — see §4 below and `DECISIONS.md` for why.)
 
 This matches the pipeline specified in the design handoff (`README.md`) exactly — `buildModel → analytics → insight engine → AI presentation → UI` — and was implemented as specified rather than reinterpreted.
 
@@ -49,14 +52,16 @@ All 17 files suggested by the handoff's TypeScript split exist, each ported from
 |---|---|---|
 | Domain | `domain/model.ts`, `domain/dataQuality.ts` | `buildModel`, stage constants, the one data repair |
 | Format | `format.ts` | INR/percent/date/number formatting shared by every screen |
-| Analytics | `analytics/funnel.ts`, `aging.ts`, `targets.ts`, `reps.ts`, `deliveries.ts`, `trends.ts`, `context.ts`, `deviation.ts` | Funnel/leak math, aging buckets, target attainment, rep rows, delivery delay stats, monthly trend, `analyze()`, funnel deviation (extra beyond the handoff split) |
-| Insights | `insights/priority.ts`, `anomalies.ts`, `recommendations.ts`, `forecast.ts`, `whatif.ts`, `riskLabel.ts` | Priority scoring (normalized against the strongest open case, not clamped), z-test anomaly detection, recommendation generation, pipeline forecasting, what-if scenarios, discrete risk labels — the last three are additions beyond the handoff's minimum split |
+| Analytics | `analytics/funnel.ts`, `aging.ts`, `targets.ts`, `reps.ts`, `deliveries.ts`, `trends.ts`, `context.ts`, `deviation.ts`, `models.ts` | Funnel/leak math, aging buckets, target attainment, rep rows, delivery delay stats, monthly trend, `analyze()`, funnel deviation, per-model demand-vs-revenue rollup (`models.ts` — added after benchmarking against a reference submission, backs the `/models` Demand screen; see `DECISIONS.md`) |
+| Insights | `insights/priority.ts`, `anomalies.ts`, `recommendations.ts`, `forecast.ts`, `whatif.ts`, `riskLabel.ts`, `testDriveGate.ts` | Priority scoring (normalized against the strongest open case, not clamped), z-test anomaly detection, recommendation generation, pipeline forecasting, what-if scenarios, discrete risk labels, the test-drive hard-gate finding (`testDriveGate.ts` — leads that reach Contacted but never Test Drive essentially never deliver; a structural fact computed from `status_history`, not a rate) |
 | AI (rule-based) | `ai/executiveBrief.ts`, `explanations.ts`, `questionRouter.ts`, `compare.ts` | Executive brief, why-explanations/branch/rep summaries, the deterministic question router, comparison narratives |
 | AI (LLM, optional) | `ai/gemini/*`, `ai/aiService.ts` | See §3 |
 | Export | `export/csv.ts`, `pdf.ts`, `xlsx.ts`, `report.ts` | CSV action export, PDF/XLSX reports built off a shared `buildExecutiveReport()` |
-| RAG | `rag/corpus.ts`, `rag/retrieval.ts` | Real embedding-based (Gemini embeddings, cosine similarity) retrieval over three markdown docs, backing `/docs` |
+| RAG | `rag/corpus.ts`, `rag/retrieval.ts` | Real embedding-based (Gemini embeddings, cosine similarity) retrieval over three markdown docs, backing Ask DealerPulse's answers to policy/process questions (previously also had a dedicated `/docs` browsing tab, since removed) |
 
 The load-bearing analytics decisions documented in the handoff — matured-cohort conversion (`model.maturityDays`, not hardcoded; `kpi.conversion` is `null` below 10 matured leads, rendered as "—" never 0%), leaks ranked by `excessLoss` (leads lost) rather than percentage gap, target attainment always shown with rank and pace rather than as a raw percentage, priority scores normalized against the open book's strongest case rather than clamped, and `STALE_DAYS = 8` as a single constant interpolated everywhere — were preserved as specified, since they are judgment calls that change what the product asserts, not stylistic choices.
+
+Two constants added after the handoff, following the same "one named constant, never a magic number" rule: `MIN_RATED_LEADS = 10` (`domain/model.ts`) — the floor below which a branch/rep conversion rate renders as "Not rated" rather than a number a small sample could swing by 10+ points — and `monthsBehindLive()` (`format.ts`), which turns `model.asOfLabel` into "Data as of 31 Dec 2025 · N months behind live", computed live off the real clock rather than hardcoded, so the label doesn't go stale as time passes after a demo/interview.
 
 ## 3. AI layer — three tiers, each degrading to the next
 
@@ -70,11 +75,13 @@ A deliberate design constraint: **no LLM is ever asked to compute a number.** Al
 
 ## 4. Routes (App Router)
 
-All 7 screens named in the handoff exist and match its structure: `/` (Overview), `/branches`, `/branches/[branchId]`, `/reps` + `/reps/[repId]`, `/actions` (Action Center), `/funnel` (Funnel Diagnostics), `/about`. Each has its own `loading.tsx` (shimmer skeleton, not a spinner, per the handoff's stated preference).
+6 of the 7 screens named in the handoff exist and match its structure: `/` (Overview), `/branches`, `/branches/[branchId]`, `/reps` + `/reps/[repId]`, `/actions` (Action Center), `/funnel` (Funnel Diagnostics). Each has its own `loading.tsx` (shimmer skeleton, not a spinner, per the handoff's stated preference). `/about` was built to match the handoff, then later removed as a standalone nav tab — see below.
 
-Beyond the handoff's minimum: `/compare` (branch/rep comparison mode), `/weekly` (executive summary, PDF/XLSX export surface), `/docs` (RAG-backed documentation search), `/welcome`, and `/ai-health` (an unlinked internal observability page for the AI fallback chain).
+Beyond the handoff's minimum: `/compare` (branch/rep comparison mode) is the one that stayed from the original build. `/weekly` (executive summary, PDF/XLSX export surface), `/docs` (RAG-backed documentation browsing), and `/about` were built, then removed as standalone nav tabs in a later cleanup pass — none were requested by the take-home assignment, and they diluted the "understand everything at a glance" premise the rest of the product is built around (see `DECISIONS.md` §3, "Cut Weekly, Docs, and About as standalone nav tabs"). The capabilities stayed: PDF/XLSX export still runs off `buildExecutiveReport()` from Overview's export buttons, and RAG retrieval still backs Ask DealerPulse. `/welcome` and `/ai-health` (an unlinked internal observability page for the AI fallback chain) remain.
 
-API surface (`app/src/app/api/`): `ask`, `summarize`, `why`, `compare`, `lead`, `export/pdf`, `export/xlsx`, `tools/execute` (the tool endpoint the external `ai-service` calls back into), `feedback`, `ai/health`, `docs/summarize`, `search-index`.
+`/models` (Demand) and `/leads` (Leads) were added in a later pass, after benchmarking the deployed app against another candidate's submission on the same assignment/dataset (see `GAP_ANALYSIS_VS_REFERENCE.md`, `MASTER_INTERVIEW_PREP.md` §5). `/models` ranks leads/test-drive-rate/conversion/revenue per vehicle model (`lib/analytics/models.ts`), surfacing the sharpest "lead volume share ≠ revenue share" mismatch; it's filter-scoped like Branches/Reps/Funnel because it answers "what's demand doing in this window." `/leads` is the self-serve "show me every lead regardless of outcome" table (`components/leads/LeadsTable.tsx`) with cohort quick-filter chips (Never contacted / No test drive / Stuck orders / Cold 7+ days / Lost / Delivered) — deliberately branch/rep-scoped but **not** time-range-filtered, for the same reason Revenue at Risk and lead aging aren't: a present-tense "which leads exist" view shouldn't let a manager hide a lead by picking a shorter window.
+
+API surface (`app/src/app/api/`): `ask`, `summarize`, `why`, `compare`, `lead`, `export/pdf`, `export/xlsx`, `tools/execute` (the tool endpoint the external `ai-service` calls back into), `feedback`, `ai/health`, `search-index`. (`docs/summarize` was removed along with the `/docs` page it only served.)
 
 ## 5. Deployment
 
@@ -83,8 +90,9 @@ API surface (`app/src/app/api/`): `ask`, `summarize`, `why`, `compare`, `lead`, 
 
 ## 6. Testing
 
-- **TypeScript (Vitest)**, `app/src/lib/__tests__/`: `analytics.test.ts` (59 assertions — the reference suite's 58 plus one new one), `anomaly-ranking.test.ts` (4), `forecast-whatif.test.ts` (10), `fault-tolerance.test.ts` (10, covers the three-tier AI fallback).
+- **TypeScript (Vitest)**, `app/src/lib/__tests__/`: `analytics.test.ts` (58 assertions — the reference suite's own count), `anomaly-ranking.test.ts` (4), `forecast-whatif.test.ts` (10), `fault-tolerance.test.ts` (10, covers the three-tier AI fallback).
 - **Python (pytest)**, `ai-service/tests/`: 8 files covering config, tools, main app, graph-level fallback, summarize fallback, multi-turn conversation persistence, agent cache reconfiguration, and a live-Gemini smoke test that skips without a real API key.
+- **AI eval harness** (`app/evals/`, run via `npm run eval`): a deterministic, read-only runner (`run.ts`) over four fixture sets — `golden_questions.json` (16 grounded Q&A cases), `regression_cases.json` (9), `rag_cases.json` (5, checks retrieval actually returns the right doc/section, not just a keyword match), `security_cases.json` (11, prompt-injection/system-prompt-leak attempts). Any check that genuinely requires a live Gemini/embedding call is reported as **SKIPPED**, never a fabricated PASS, when `GEMINI_API_KEY` isn't configured — this is a golden-dataset eval harness for AI answer quality, not just the guardrail/fallback unit tests above.
 
 ## 7. Coverage against `ASSIGNMENT.md` minimum requirements
 
@@ -103,6 +111,5 @@ All three gaps the handoff itself flagged as open ("Known gaps": custom date ran
 Carried over from `app/DECISIONS.md` for a single source of truth:
 
 - AI observability and feedback are stored **in-memory only** — no persistence across restarts (both the Next.js side and `ai-service`).
-- No golden-dataset eval harness for AI answer quality — only guardrail/fallback tests and a handful of live-Gemini smoke tests.
 - No formal screen-reader accessibility pass (keyboard traversal and contrast were addressed; screen-reader testing was not).
 - `ai-service` has no production deployment path — it is a local/optional enhancement layer only, by design (§5).

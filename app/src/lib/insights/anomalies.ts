@@ -1,4 +1,4 @@
-import { MAX_ANOMALIES, STALE_DAYS, div, mean, zProportion } from '../domain/model';
+import { MAX_ANOMALIES, MIN_RATED_LEADS, STALE_DAYS, div, mean, zProportion } from '../domain/model';
 import { fmtDays, fmtINR, fmtNum, fmtPct, fmtSigned } from '../format';
 import type { EvidenceItem } from '../domain/types';
 import { stageLeaks } from '../analytics/funnel';
@@ -61,6 +61,29 @@ export function detectAnomalies(ctx: Context): Anomaly[] {
       });
     }
   });
+
+  const gate = ctx.testDriveGate;
+  if (gate.neverTestDriven >= 15) {
+    const topBranch = gate.byBranch[0];
+    out.push({
+      id: 'test-drive-gate',
+      type: 'Test drive gate',
+      severity: gate.deliveredDespiteGate === 0 ? 'critical' : 'risk',
+      title: gate.neverTestDriven + ' leads reached Contacted but never Test Drive — ' + gate.deliveredDespiteGate + ' of them ever delivered',
+      metric: 'Contacted-without-test-drive leads',
+      expected: '0 delivered without a test drive', actual: gate.deliveredDespiteGate + ' delivered of ' + gate.neverTestDriven,
+      difference: fmtINR(gate.neverTestDrivenValue) + ' stranded before the gate',
+      evidence: [
+        { label: 'Never test-driven', value: fmtNum(gate.neverTestDriven), note: fmtINR(gate.neverTestDrivenValue) },
+        { label: 'Delivered anyway', value: fmtNum(gate.deliveredDespiteGate), note: gate.deliveredDespiteGate === 0 ? 'confirms the gate is absolute' : 'exception to investigate' },
+        ...(topBranch ? [{ label: 'Worst branch', value: topBranch.branchName, note: fmtNum(topBranch.count) + ' leads · ' + fmtINR(topBranch.value) }] : []),
+      ],
+      explanation: 'Test drive behaves as a hard gate rather than a soft funnel stage: of ' + gate.neverTestDriven + ' leads that got contacted but never test-driven, ' + gate.deliveredDespiteGate + ' ever closed. ' + (topBranch ? topBranch.branchName + ' carries the largest share at ' + fmtINR(topBranch.value) + '.' : ''),
+      impact: fmtINR(gate.neverTestDrivenValue) + ' in deal value is effectively irretrievable until these leads are pushed into a test drive.',
+      cta: { label: 'Open funnel diagnostics', route: { screen: 'funnel', anchor: 'test-drive-gate' } },
+      magnitude: gate.neverTestDrivenValue,
+    });
+  }
 
   const worst = ctx.netFunnel.slice(1).reduce((a, b) => (a.dropOff >= b.dropOff ? a : b));
   ctx.netFunnel.slice(1).forEach((s, i) => {
@@ -200,7 +223,7 @@ export function detectAnomalies(ctx: Context): Anomaly[] {
     });
   }
 
-  const eligible = ctx.reps.filter((r) => r.leads >= 10);
+  const eligible = ctx.reps.filter((r) => r.leads >= MIN_RATED_LEADS);
   if (eligible.length >= 5) {
     const base = ctx.netMaturedConversion;
     eligible.forEach((r) => {

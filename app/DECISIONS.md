@@ -8,7 +8,7 @@ The line between those layers is deliberate. Business numbers (conversion, funne
 
 ## 2. What We Built
 
-A Next.js (App Router) + TypeScript + Tailwind + Recharts app with seven core screens — Overview, Branches, Branch Detail, Rep Scorecard, Action Center, Funnel Diagnostics, and About — plus Compare, Weekly (executive report), and Docs (RAG search).
+A Next.js (App Router) + TypeScript + Tailwind + Recharts app with six core screens — Overview, Branches, Branch Detail, Rep Scorecard, Action Center, and Funnel Diagnostics — plus Compare for side-by-side branch/rep analysis, and Demand and Leads, added after benchmarking against a reference submission on the same assignment (§3, "Benchmark against a reference submission, then close the gap").
 
 On top of the core screens:
 
@@ -88,6 +88,22 @@ The technical architecture — file layout, pipeline, routes, deployment — is 
 
 **Result:** The UI says what it is instead of faking persistence a reviewer would eventually notice was missing.
 
+### Decision: Cut Weekly, Docs, and About as standalone nav tabs
+
+**Why:** None of the three were requested by the assignment brief. The brief's premise is a CEO who doesn't have time to dig — Weekly mostly re-rendered Overview's own numbers in a forwardable shape, and Docs/About were internal methodology and reference-document pages, not something a CEO acts on. Nine nav tabs also worked against the product's own "understand everything at a glance" pitch: two tabs that only justify their existence to the person who built them is exactly the kind of clutter the assignment's evaluation criteria (information hierarchy, storytelling) penalize.
+
+**Trade-off:** Losing three tabs' worth of visible surface area, and the About page's explicit "check any claim the product makes" data-quality/methodology transparency is no longer one click away from every screen.
+
+**Result:** The capabilities underneath didn't disappear — `buildExecutiveReport()` still powers PDF/XLSX export from Overview's export buttons, and the RAG corpus still backs Ask DealerPulse's answers to policy/process questions — only the dedicated pages built around them were removed. Six core screens plus Compare is a tighter set that matches the reference-app-style nav (Overview, Branches, Reps, Action Center, Funnel, Compare) without losing any computed insight.
+
+### Decision: Benchmark against a reference submission, then close the gap
+
+**Why:** Both apps read the identical `dealership_data.json`, so any difference in what each surfaces is a presentation/analysis choice, not a data gap — a cheap way to find blind spots that a solo build pass can't see in itself. See `GAP_ANALYSIS_VS_REFERENCE.md` for the full comparison.
+
+**Trade-off:** Chasing every gap found would mean re-ranking Branches/Reps/Sources by revenue-per-lead instead of conversion % — a bigger, riskier change than the rest of the list, since it touches the primary sort key on three screens at once.
+
+**Result:** Four gaps were closed because they were additive and derivable from data the model already computed: the test-drive "hard gate" finding (`lib/insights/testDriveGate.ts` — leads reaching Contacted but never Test Drive essentially never deliver, stated as an absolute, not a rate), a `/models` Demand page (lead-share vs. revenue-share mismatch by vehicle model), a `/leads` self-serve table (every lead regardless of outcome, with cohort quick-filters — Action Center stays scored-open-leads-only by design), and a "N months behind live" staleness note on the "Data as of" badge. Revenue-per-lead as the primary rank was named and deliberately **not** built this pass, and said so explicitly rather than silently skipped — see §4.
+
 ## 4. What We Deliberately Did Not Build
 
 - **No database** — the dataset is small enough that in-memory, server-side computation is simpler and faster than a DB round-trip; see Decision above.
@@ -95,6 +111,7 @@ The technical architecture — file layout, pipeline, routes, deployment — is 
 - **No real CRM writes** — Contact/Assign/Escalate are local UI state, not backend persistence, because building fake persistence would be more dishonest than useful.
 - **No production deployment for `ai-service`** — it's an optional local/demo agent tier with no Dockerfile or deploy config; the production app runs on the in-process Gemini tier by default, so the shipped product's minimum requirements never depend on an undeployed service.
 - **No persistent AI observability/feedback** — the call log and feedback control are in-memory only, scoped to a single running process.
+- **No revenue-per-lead as the primary ranking metric** on Branches/Reps/Sources — flagged by benchmarking against a reference submission (`GAP_ANALYSIS_VS_REFERENCE.md`) as its sharpest differentiator (it accounts for deal-value differences a percentage hides), but held back deliberately: re-ranking three screens' primary sort key is a bigger decision than the rest of that pass's fixes, and conversion % remains defensible and consistent with the rest of the product's language.
 
 ## 5. Differentiation / Open-Ended Work
 
@@ -107,6 +124,8 @@ Beyond the assignment's minimum, a few additions make this closer to a tool a ma
 - **PDF/XLSX executive reporting**, built from the same report function as the on-screen view, means the report a CEO forwards can never drift from what the dashboard shows.
 - **AI guardrails and fallbacks** (rate limiting, timeouts with retry, schema-validated output, three-tier degradation) make the AI layer something that fails safely instead of just failing.
 - **Feedback and observability** (Helpful/Not Helpful/Report Incorrect, an internal AI call log) start building the evaluation habit a real deployment would need, even though today it's in-memory only.
+- **A deterministic AI eval harness** (`app/evals/`, `npm run eval`) — golden questions, regression cases, RAG-retrieval-correctness cases, and prompt-injection/security cases, run read-only against the real dashboard; any check needing a live Gemini/embedding call is reported SKIPPED, never a fabricated pass, without a configured API key.
+- **A test-drive "hard gate" finding, a Demand page, and a self-serve Leads table** — added after benchmarking against a reference submission on the same assignment/dataset; see §3 above and `GAP_ANALYSIS_VS_REFERENCE.md`.
 
 ## 6. Interesting Data Findings
 
@@ -121,3 +140,7 @@ The branch's real problem is upstream: its New → Contacted rate is the leak (5
 ### Target calibration
 
 Target attainment tops out around 15% network-wide, and that gap is roughly uniform across every branch. A uniform shortfall of that size across an entire network reads as a target-calibration problem — the targets themselves were likely set too high — rather than five branches independently underperforming. The product treats this as a calibration finding rather than ranking branches against a target nobody could actually hit.
+
+### The test drive gate
+
+Leads that reach Contacted but never reach Test Drive have essentially never delivered — zero of them, in the current dataset. That's a stronger and more falsifiable claim than "conversion is low at this stage," because it's an absolute boundary condition, not a percentage a reader has to judge for themselves. It reframes test drive from one soft stage among several into the actual gate the whole funnel hinges on — the operational implication is to prioritize getting a stalled lead into a test drive over any other intervention (negotiation help, follow-up cadence), because none of those matter if the gate itself was never passed.

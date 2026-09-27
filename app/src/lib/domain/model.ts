@@ -1,6 +1,6 @@
 /* DealerPulse domain model. Layers: domain model -> analytics -> insight engine -> AI presentation.
    Everything is a pure function of the dataset. No hardcoded findings. */
-import { fmtDate } from '../format';
+import { fmtDate, monthsBehindLive } from '../format';
 import type {
   Branch, Delivery, HistoryEntry, Lead, Model, RawData, Rep, StageKey, Target,
 } from './types';
@@ -31,6 +31,13 @@ export const SOURCE_LABEL: Record<string, string> = {
 
 const DAY = 86400000;
 export const STALE_DAYS = 8;
+
+/** Below this many leads, a rep's raw conversion rate is noise (one delivery
+    swings it by 10+ points) — the anomaly gate already refuses to judge a rep
+    this thin; the UI should refuse to display a number for one too, per the
+    same "don't fake a rate from an inadequate sample" rule the network KPI
+    already follows (see `maturedConversion`'s n>=10 floor). */
+export const MIN_RATED_LEADS = 10;
 
 /* ---------- small math helpers ---------- */
 export const sum = (a: number[]): number => a.reduce((s, x) => s + x, 0);
@@ -160,8 +167,11 @@ export function buildModel(raw: RawData, asOfISO?: string): Model {
     .map((l) => (l.stageAt.delivered!.getTime() - l.createdAt.getTime()) / DAY);
   const maturityDays = Math.round(median(toDelivery) || 40);
 
+  const monthsBehind = monthsBehindLive(asOf);
+  const asOfLabel = fmtDate(asOf) + (monthsBehind >= 1 ? ` · ${monthsBehind} month${monthsBehind === 1 ? '' : 's'} behind live` : '');
+
   return {
-    asOf, asOfLabel: fmtDate(asOf), meta: raw.metadata,
+    asOf, asOfLabel, meta: raw.metadata,
     branches, branchById, reps, repById, leads, leadById, deliveries, targets, months,
     maturityDays,
     dataStart: new Date(months[0] + '-01T00:00:00Z'),

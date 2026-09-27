@@ -64,3 +64,27 @@ A lead is "stale" at **8 or more days** of no recorded activity. This
 threshold is deliberately set at the boundary between the "4-7 day" and
 "8-14 day" aging buckets, so the headline stale count always reconciles
 exactly with the sum of the 8+, 15-30, and 30+ bucket rows.
+
+## Not Rated (minimum sample size)
+
+A branch's or rep's conversion rate is only ever shown as a number once it
+has handled at least 10 leads. Below that floor, DealerPulse displays "Not
+rated" rather than a raw percentage, because a handful of leads can swing a
+conversion rate by 10 or more points — a single lucky or unlucky outcome
+would otherwise be indistinguishable from a real trend. This is the same
+"don't fake a rate from an inadequate sample" principle the network-level
+matured-cohort conversion metric already follows, applied at the individual
+branch/rep level.
+
+## The Test Drive Gate
+
+Leads that reach the Contacted stage but never reach Test Drive have, in
+practice, essentially no realistic path to closing — this is treated as a
+hard gate rather than just another stage with a somewhat lower conversion
+rate. It is stated as an absolute (how many such leads exist, and how many
+of them ever delivered anyway — normally zero) rather than a percentage,
+because a hard boundary condition is a stronger and more falsifiable claim
+than "conversion is low at this stage." The operational implication:
+getting a stalled lead into a test drive should be prioritised over any
+other intervention, since no later-stage fix (negotiation skill, follow-up
+cadence) matters if the gate itself was never passed.

@@ -326,6 +326,19 @@ body {
   background: transparent;
 }
 
+/* Scrolling stays fully functional; the scrollbar track/thumb itself is
+   just not drawn. Reserved for pure chrome (the nav rail) — NOT for
+   overflow-x-auto data tables, where the scrollbar is the only visual
+   affordance telling a mouse user there are more columns to the right. */
+.dp-scroll-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.dp-scroll-hidden::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
 /* Print: reuse the same components, just swap the token values for a clean,
    ink-cheap light printout instead of duplicating layouts as separate pages. */
 @media print {

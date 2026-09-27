@@ -1,5 +1,5 @@
 import type { FunnelStage } from "@/lib/analytics/funnel";
-import { fmtDays, fmtNum, fmtPct } from "@/lib/format";
+import { fmtDays, fmtINR, fmtNum, fmtPct } from "@/lib/format";
 
 interface StageFlag {
   stage: string;
@@ -81,6 +81,7 @@ export function StageList({
               {!isEntrant && (
                 <p className="mt-1 text-[10.5px] text-ink-muted">
                   {s.dropOff} did not progress · {s.lostHere} marked lost from the previous stage
+                  {s.lostHere > 0 && <> · <span className="text-ink-tertiary">{fmtINR(s.lostValue)} value lost</span></>}
                 </p>
               )}
             </div>

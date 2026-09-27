@@ -18,8 +18,9 @@ const SCREENS: Item[] = [
   { id: "s-rp", group: "Screens", label: "Rep Leaderboard", href: "/reps" },
   { id: "s-ac", group: "Screens", label: "Action Center", href: "/actions" },
   { id: "s-fn", group: "Screens", label: "Funnel Diagnostics", href: "/funnel" },
+  { id: "s-dm", group: "Screens", label: "Demand", href: "/models" },
+  { id: "s-ld", group: "Screens", label: "Leads", href: "/leads" },
   { id: "s-cp", group: "Screens", label: "Compare", href: "/compare" },
-  { id: "s-ab", group: "Screens", label: "About", href: "/about" },
 ];
 
 export function CommandPalette() {

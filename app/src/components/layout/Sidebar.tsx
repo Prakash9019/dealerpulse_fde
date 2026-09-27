@@ -11,10 +11,9 @@ const NAV = [
   { href: "/reps", mark: "RP", label: "Reps" },
   { href: "/actions", mark: "AC", label: "Action Center" },
   { href: "/funnel", mark: "FN", label: "Funnel" },
+  { href: "/models", mark: "DM", label: "Demand" },
+  { href: "/leads", mark: "LD", label: "Leads" },
   { href: "/compare", mark: "CP", label: "Compare" },
-  { href: "/weekly", mark: "WK", label: "Weekly" },
-  { href: "/docs", mark: "DC", label: "Docs" },
-  { href: "/about", mark: "AB", label: "About" },
 ];
 
 const STORAGE_KEY = "dp-sidebar-collapsed";
@@ -50,7 +49,7 @@ function setCollapsed(next: boolean) {
   listeners.forEach((l) => l());
 }
 
-export function Sidebar({ datasetScope }: { datasetScope: string }) {
+export function Sidebar() {
   const pathname = usePathname();
   const collapsed = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
@@ -65,7 +64,7 @@ export function Sidebar({ datasetScope }: { datasetScope: string }) {
   return (
     <nav
       aria-label="Main"
-      className={`no-print hidden md:flex sticky top-0 h-screen w-[62px] ${expandedClass} shrink-0 flex-col overflow-y-auto overflow-x-hidden bg-bg-rail border-r border-line-hairline px-2 py-4 gap-1 transition-[width] duration-200 ease-out`}
+      className={`dp-scroll-hidden no-print hidden md:flex sticky top-0 h-screen w-[62px] ${expandedClass} shrink-0 flex-col overflow-y-auto overflow-x-hidden bg-bg-rail border-r border-line-hairline px-2 py-4 gap-1 transition-[width] duration-200 ease-out`}
     >
       <div className="flex items-center gap-2 px-1 mb-4">
         <span aria-hidden="true" className="relative inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md bg-accent">
@@ -116,19 +115,7 @@ export function Sidebar({ datasetScope }: { datasetScope: string }) {
         );
       })}
 
-      <div
-        className={`mt-auto pt-4 border-t border-line-hairline text-[11px] leading-relaxed text-ink-muted ${
-          collapsed ? "hidden" : "hidden lg:block"
-        }`}
-      >
-        <div className="mb-1 font-mono text-[9.5px] tracking-[0.08em] text-ink-muted">
-          DATASET
-        </div>
-        <div>5 branches · 30 reps</div>
-        <div>{datasetScope}</div>
-      </div>
-
-      <div className={collapsed ? "mt-2" : "mt-2 border-t border-line-hairline pt-2"}>
+      <div className={collapsed ? "mt-auto" : "mt-auto border-t border-line-hairline pt-2"}>
         <ThemeToggle collapsed={collapsed} />
       </div>
 

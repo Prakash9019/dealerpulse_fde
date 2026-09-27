@@ -50,6 +50,19 @@ asserts that zero branch-level anomalies result. This is what demonstrates
 the detector is actually finding statistical patterns in the data, not
 repeating a hardcoded list of "problem branches."
 
+## The test-drive gate is a structural check, not a z-test
+
+One anomaly type — the test-drive gate — is not statistical at all, and is
+deliberately excluded from the z-test framework described above. It fires
+whenever at least 15 leads have reached Contacted but never reached Test
+Drive, and its severity is decided by a hard structural fact rather than a
+sample-size-adjusted comparison: **critical** if literally zero of those
+leads ever delivered (confirming the gate is absolute), **risk** if a small
+number delivered anyway (the exception, not the rule). This is intentional
+— a boundary condition this stark ("zero delivered without a test drive")
+is a stronger, more falsifiable claim than any percentage a z-test could
+produce, so it is reported as a fact, not a probability.
+
 ## Ranking and flood control
 
 Anomalies are always sorted by severity tier first. Within a tier, they are

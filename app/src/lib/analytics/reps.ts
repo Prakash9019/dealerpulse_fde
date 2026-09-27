@@ -14,6 +14,7 @@ export interface RepRow {
   orders: number;
   delivered: number;
   conversion: number;
+  adjustedConversion: number;
   pipelineValue: number;
   revenue: number;
   openCount: number;
@@ -34,15 +35,18 @@ export function repRows(model: Model, leads: Lead[], dels: Delivery[]): RepRow[]
     const open = ls.filter((l) => l.open);
     const stale = open.filter((l) => l.idleDays >= STALE_DAYS);
     const d = dels.filter((x) => x.repId === id);
+    const contacted = ls.filter((l) => 'contacted' in l.stageAt);
+    const delivered = ls.filter((l) => l.status === 'delivered');
     return {
       id, name: rep?.name || id, branchId: rep?.branchId, branchName: rep?.branchName,
       role: rep?.roleLabel || '—',
       leads: ls.length,
-      contacted: ls.filter((l) => 'contacted' in l.stageAt).length,
-      contactRate: div(ls.filter((l) => 'contacted' in l.stageAt).length, ls.length),
+      contacted: contacted.length,
+      contactRate: div(contacted.length, ls.length),
       orders: ls.filter((l) => 'order_placed' in l.stageAt).length,
-      delivered: ls.filter((l) => l.status === 'delivered').length,
+      delivered: delivered.length,
       conversion: conversion(ls),
+      adjustedConversion: div(delivered.length, contacted.length),
       pipelineValue: sum(open.map((l) => l.dealValue)),
       revenue: sum(d.map((x) => x.revenue)),
       openCount: open.length,

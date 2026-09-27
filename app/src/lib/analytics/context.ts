@@ -9,6 +9,7 @@ import { type LostReasons, type MonthlyTrendRow, type SourcePerfRow, lostReasons
 import { type ActionQueue, actionQueue } from '../insights/priority';
 import { type Anomaly, detectAnomalies } from '../insights/anomalies';
 import { type Recommendation, buildRecommendations } from '../insights/recommendations';
+import { type TestDriveGate, testDriveGate } from '../insights/testDriveGate';
 
 const DAY = 86400000;
 
@@ -135,6 +136,7 @@ export interface Context {
   actions: ActionQueue;
   anomalies: Anomaly[];
   recommendations: Recommendation[];
+  testDriveGate: TestDriveGate;
 }
 
 /** The single analytics context every screen reads from. */
@@ -239,6 +241,7 @@ export function analyze(model: Model, filters: Filters = {}): Context {
     branchRows, reps,
     sources: sourcePerf(cohort), netSources: sourcePerf(model.leads.filter((l) => inRange(l.createdAt))),
     lost: lostReasons(cohort),
+    testDriveGate: testDriveGate(allScoped),
     stageDurations: f.slice(1).map((s, i) => ({
       from: f[i].stage, to: s.stage, label: f[i].label + ' → ' + s.label,
       medianDays: s.medianDays, p90Days: s.p90Days, conversion: s.convFromPrev, n: s.n, dropOff: s.dropOff,

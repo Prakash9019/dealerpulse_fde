@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getContext, getModel, parseFilters } from "@/lib/data";
 import type { SearchParams } from "@/lib/data";
 import { RANGE_PRESETS } from "@/lib/analytics/context";
@@ -63,11 +64,18 @@ export default async function ActionCenterPage({
       rangePresets={RANGE_PRESETS}
     >
       <div className="flex flex-col gap-5">
-        <div className="no-print flex justify-end">
+        <div className="no-print flex items-center justify-between gap-3">
+          <p className="text-[12px] text-ink-muted">
+            Every open lead, scored and ranked. For the full record — lost and delivered leads included —
+            see <Link href="/leads" className="text-accent hover:underline">Leads</Link>.
+          </p>
           <SummarizeButton screen="actions" />
         </div>
         {topRec && <AiStartHere rec={topRec} range={range} />}
-        <Recommendations recs={ctx.recommendations} range={range} />
+        {(() => {
+          const remaining = topRec ? ctx.recommendations.slice(1) : ctx.recommendations;
+          return remaining.length > 0 && <Recommendations recs={remaining} range={range} />;
+        })()}
         <QueueTable
           rows={rows}
           branches={model.branches}

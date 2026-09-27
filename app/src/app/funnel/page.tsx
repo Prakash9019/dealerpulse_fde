@@ -9,6 +9,7 @@ import { SummarizeButton } from "@/components/ui/SummarizeButton";
 import { Shell } from "@/components/layout/Shell";
 import { ScopeSelect } from "@/components/funnel/ScopeSelect";
 import { StageList } from "@/components/funnel/StageList";
+import { TestDriveGateCard } from "@/components/funnel/TestDriveGateCard";
 import { StageBottlenecks } from "@/components/funnel/StageBottlenecks";
 import { SourceQuality } from "@/components/funnel/SourceQuality";
 import { DeliveryOps } from "@/components/funnel/DeliveryOps";
@@ -89,6 +90,8 @@ export default async function FunnelDiagnosticsPage({
           range={range}
         />
 
+        <TestDriveGateCard gate={scopedCtx.testDriveGate} />
+
         <StageList
           funnel={scopedCtx.funnel}
           netFunnel={networkCtx.netFunnel}
@@ -102,7 +105,7 @@ export default async function FunnelDiagnosticsPage({
 
         <SourceQuality sources={scopedCtx.sources} baseline={networkCtx.netMaturedConversion} />
 
-        <DeliveryOps delivery={scopedCtx.delivery} />
+        <DeliveryOps delivery={scopedCtx.delivery} branchRows={networkCtx.branchRows} />
       </div>
     </Shell>
   );

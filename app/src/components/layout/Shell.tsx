@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { RangeControl } from "./RangeControl";
 import { AskDealerPulse } from "../overlays/AskDealerPulse";
+import { AskFab } from "./AskFab";
+import { WhyPopoverProvider } from "../ui/WhyPopoverProvider";
 import { CommandPalette } from "../overlays/CommandPalette";
 import { KeyboardShortcutsPanel } from "../overlays/KeyboardShortcutsPanel";
 import { SavedViews } from "./SavedViews";
@@ -83,8 +85,9 @@ export function Shell({
   }
 
   return (
+    <WhyPopoverProvider>
     <div className="flex min-h-screen bg-bg-app">
-      <Sidebar datasetScope={scopeLabel} />
+      <Sidebar />
       <div className="flex flex-1 flex-col min-w-0">
         <header className="no-print sticky top-0 z-30 flex flex-wrap items-center gap-3 border-b border-line-hairline bg-bg-topbar px-4 py-3 backdrop-blur-sm">
           <div className="min-w-0">
@@ -175,21 +178,16 @@ export function Shell({
       {askOpen ? (
         <AskDealerPulse onClose={() => setAskOpen(false)} />
       ) : (
-        // Floating launcher, docked bottom-right — the trigger itself lives
-        // where the chat panel opens, not just up in the header, so it
-        // reads as "there's a chat widget down here" on every screen.
-        <button
-          type="button"
-          onClick={() => setAskOpen(true)}
-          aria-label="Ask DealerPulse"
-          className="dp-card-hover fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-full border border-accent-tint-border bg-accent-tint-bg px-4 py-3 text-left shadow-[0_12px_30px_oklch(0.08_0.006_75_/_0.5)] sm:bottom-6 sm:right-6"
-        >
-          <span aria-hidden="true" className="dp-ai-mark inline-block h-3 w-3 rotate-45 rounded-[2px] bg-accent shrink-0" />
-          <span className="text-[13px] font-medium text-ink-secondary">Ask DealerPulse</span>
-        </button>
+        // Floating launcher, docked to the right edge — the trigger itself
+        // lives where the chat panel opens, not just up in the header. It's
+        // icon-only (the header pill already spells out "Ask DealerPulse…")
+        // and vertically draggable so it can be moved out of the way of
+        // whatever it's covering.
+        <AskFab onOpen={() => setAskOpen(true)} />
       )}
       <CommandPalette />
       <KeyboardShortcutsPanel />
     </div>
+    </WhyPopoverProvider>
   );
 }

@@ -2,8 +2,6 @@ import { getContext, getModel, parseFilters } from "@/lib/data";
 import type { SearchParams } from "@/lib/data";
 import { RANGE_PRESETS } from "@/lib/analytics/context";
 import { executiveBrief } from "@/lib/ai/executiveBrief";
-import { branchSummary } from "@/lib/ai/explanations";
-import { monthlyTrend } from "@/lib/analytics/trends";
 import { forecastPipeline, stageDeliveryRates } from "@/lib/insights/forecast";
 import { rankAnomalies } from "@/lib/insights/anomalies";
 import { fmtINR, fmtNum, fmtPct, fmtSigned } from "@/lib/format";
@@ -11,7 +9,6 @@ import { Shell } from "@/components/layout/Shell";
 import { ExecutiveBrief } from "@/components/overview/ExecutiveBrief";
 import { KpiCard } from "@/components/ui/KpiCard";
 import { MonthlyChart } from "@/components/overview/MonthlyChart";
-import { BranchTable } from "@/components/overview/BranchTable";
 import { NetworkHealthMatrix } from "@/components/overview/NetworkHealthMatrix";
 import { FunnelOverview } from "@/components/overview/FunnelOverview";
 import { InsightsList } from "@/components/overview/InsightsList";
@@ -37,37 +34,12 @@ export default async function OverviewPage({
   const branchesRanked = [...ctx.branchRows].sort((a, b) => b.maturedConversion - a.maturedConversion);
   const forecast = forecastPipeline(ctx.openLeads, stageDeliveryRates(model), ctx.kpi.units, ctx.targets.targetUnits);
 
-  const sparklines: Record<string, number[]> = {};
-  const blurbs: Record<string, string> = {};
-  branchesRanked.forEach((b) => {
-    sparklines[b.id] = monthlyTrend(model, ctx.months, { branchId: b.id }).map((m) => m.units);
-    blurbs[b.id] = branchSummary(ctx, b.id)?.performance ?? "";
-  });
-
-  const reportText = [
-    `DEALERPULSE EXECUTIVE REPORT`,
-    `${ctx.range.label} · Data as of ${model.asOfLabel}`,
-    ``,
-    brief.headline,
-    ``,
-    ...brief.findings.map((f) => `- ${f.text}`),
-    ``,
-    `DO NEXT: ${brief.action}`,
-    ``,
-    `KPIs`,
-    `Units delivered: ${fmtNum(ctx.kpi.units)}`,
-    `Revenue: ${fmtINR(ctx.kpi.revenue)}`,
-    `Lead → delivery conversion: ${ctx.kpi.conversion != null ? fmtPct(ctx.kpi.conversion) : "—"}`,
-    `Revenue at risk: ${fmtINR(ctx.kpi.revenueAtRisk)}`,
-    ``,
-    `Branch performance (ranked by conversion)`,
-    ...branchesRanked.map(
-      (b) => `${b.convRank}. ${b.name} — ${fmtPct(b.maturedConversion)} conversion, ${fmtNum(b.units)} units, ${fmtINR(b.revenue)}, ${b.status}`,
-    ),
-    ``,
-    `Top recommendations`,
-    ...ctx.recommendations.slice(0, 5).map((r) => `- [${r.horizon}] ${r.problem} → ${r.action}`),
-  ].join("\n");
+  const seasonality = (() => {
+    if (ctx.trend.length < 3) return null;
+    const leadsMonth = [...ctx.trend].sort((a, b) => b.leadsCreated - a.leadsCreated)[0];
+    const unitsMonth = [...ctx.trend].sort((a, b) => b.units - a.units)[0];
+    return leadsMonth.month !== unitsMonth.month ? { leadsMonth, unitsMonth } : null;
+  })();
 
   return (
     <Shell
@@ -82,7 +54,7 @@ export default async function OverviewPage({
       <div className="flex flex-col gap-5">
         <div className="no-print flex justify-end gap-2">
           <SummarizeButton screen="overview" />
-          <PrintReportButton textContent={reportText} filename="dealerpulse-executive-report" />
+          <PrintReportButton />
           <ExportButtons />
         </div>
 
@@ -140,6 +112,13 @@ export default async function OverviewPage({
             Monthly performance
           </h2>
           <MonthlyChart trend={ctx.trend} />
+          {seasonality && (
+            <p className="mt-2 text-[11.5px] text-ink-muted">
+              Enquiries peaked in {seasonality.leadsMonth.label} ({fmtNum(seasonality.leadsMonth.leadsCreated)} leads);
+              deliveries peaked in {seasonality.unitsMonth.label} ({fmtNum(seasonality.unitsMonth.units)} units) — a lag
+              consistent with the ~{model.maturityDays}-day lead-to-delivery cycle, not a slowdown.
+            </p>
+          )}
         </section>
 
         <NetworkHealthMatrix rows={branchesRanked} netConversion={ctx.netMaturedConversion} />
@@ -153,13 +132,6 @@ export default async function OverviewPage({
         </div>
 
         <PipelineForecastCard forecast={forecast} scopeLabel="the network" />
-
-        <section>
-          <h2 className="mb-3 text-[13.5px] font-semibold text-ink-primary">
-            Branch performance
-          </h2>
-          <BranchTable rows={branchesRanked} sparklines={sparklines} blurbs={blurbs} />
-        </section>
 
         <FunnelOverview funnel={ctx.funnel} range={range} />
         </div>

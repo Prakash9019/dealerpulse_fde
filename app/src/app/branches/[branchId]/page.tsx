@@ -52,32 +52,6 @@ export default async function BranchDetailPage({
     repBlurbs[r.id] = repSummary(ctx, r.id)?.headline ?? "";
   });
 
-  const reportText = summary
-    ? [
-        `${b.name.toUpperCase()} — BRANCH SCORECARD`,
-        `${b.city} · ${b.managerName} · ${ctx.range.label} · Data as of ${model.asOfLabel}`,
-        ``,
-        `Conversion rank ${b.convRank} of ${ctx.branchRows.length} · Status: ${b.status}`,
-        ``,
-        `KPIs`,
-        `Leads: ${fmtNum(b.leads)}`,
-        `Conversion: ${fmtPct(b.maturedConversion)} (network ${fmtPct(ctx.netMaturedConversion)})`,
-        `Units: ${fmtNum(b.units)}`,
-        `Revenue: ${fmtINR(b.revenue)}`,
-        `Target attainment: ${fmtPct(b.attainment, 0)} (rank ${b.attainmentRank})`,
-        `Pipeline value: ${fmtINR(b.pipelineValue)}`,
-        `Stale leads: ${fmtNum(b.staleCount)}`,
-        ``,
-        `AI BRANCH SUMMARY`,
-        `Going well: ${summary.performance}`,
-        `What is wrong: ${summary.problem}`,
-        `Opportunity: ${summary.opportunity}`,
-        `Do next: ${summary.action}`,
-        ``,
-        `Pipeline forecast: ${forecast.openCount} open leads worth ${fmtINR(forecast.openValue)} expected to yield ~${forecast.expectedUnits.toFixed(1)} more units (~${fmtINR(forecast.expectedRevenue)}).`,
-      ].join("\n")
-    : "";
-
   return (
     <Shell
       branches={model.branches}
@@ -89,28 +63,37 @@ export default async function BranchDetailPage({
       rangePresets={RANGE_PRESETS}
     >
       <div className="flex flex-col gap-5">
-        <div className="flex flex-wrap items-center gap-3">
-          <Link href="/branches" className="no-print text-[12.5px] text-ink-muted hover:text-ink-primary">
-            ← Branches
-          </Link>
-          <StatusPill status={b.status} />
-          <SummarizeButton screen="branch" branchId={b.id} />
-          {reportText && (
-            <PrintReportButton
-              textContent={reportText}
-              filename={`dealerpulse-${b.name.toLowerCase().replace(/\s+/g, "-")}-scorecard`}
-            />
-          )}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <Link href="/branches" className="no-print text-[12.5px] text-ink-muted hover:text-ink-primary">
+              ← Branches
+            </Link>
+            <StatusPill status={b.status} />
+          </div>
+          <div className="no-print flex items-center gap-2">
+            <SummarizeButton screen="branch" branchId={b.id} />
+            {summary && <PrintReportButton />}
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-7">
+        {/* Five cards, not seven: Target attainment and Pipeline value were dropped as
+            standalone tiles because both numbers are restated seconds later — attainment
+            in the Pipeline Forecast Card's "on pace for X%, up from Y% delivered so far"
+            line, pipeline value as that same card's "N open leads worth ₹X" line. Keeping
+            them here too was the exact kind of two-places-one-number risk this app's own
+            analytics layer was built to avoid. Attainment rank still surfaces, folded into
+            the Revenue card's sub-line instead of owning a whole tile for one number. */}
+        <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-5">
           <KpiCard index={0} label="Leads" value={fmtNum(b.leads)} />
           <KpiCard index={1} label="Conversion" value={fmtPct(b.maturedConversion)} whyKey="conversion" />
           <KpiCard index={2} label="Units" value={fmtNum(b.units)} />
-          <KpiCard index={3} label="Revenue" value={fmtINR(b.revenue)} />
-          <KpiCard index={4} label="Target attainment" value={fmtPct(b.attainment, 0)} sub={`rank ${b.attainmentRank}`} />
-          <KpiCard index={5} label="Pipeline value" value={fmtINR(b.pipelineValue)} />
-          <KpiCard index={6} label="Stale leads" value={fmtNum(b.staleCount)} valueClassName="text-warning" whyKey="risk" />
+          <KpiCard
+            index={3}
+            label="Revenue"
+            value={fmtINR(b.revenue)}
+            sub={`${fmtPct(b.attainment, 0)} of target · rank ${b.attainmentRank}`}
+          />
+          <KpiCard index={4} label="Stale leads" value={fmtNum(b.staleCount)} valueClassName="text-warning" whyKey="risk" />
         </div>
 
         {summary && (

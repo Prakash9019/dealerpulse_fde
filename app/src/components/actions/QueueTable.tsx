@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { fmtINR } from "@/lib/format";
 import { LeadDrawer } from "../overlays/LeadDrawer";
 import { Select } from "../ui/Select";
@@ -73,6 +73,15 @@ export function QueueTable({
   initialTier?: string;
 }) {
   const [tiers, setTiers] = useState<Set<string>>(new Set(initialTier ? [initialTier] : []));
+
+  // initialTier comes from the URL's ?tier= param (set by CTAs like "Work the
+  // queue" that link back to this same page). QueueTable is already mounted
+  // when that link is clicked, so the useState initializer above only ran
+  // once on first load — without this effect, a later navigation to a new
+  // ?tier= value updates the URL but never re-applies the tier filter.
+  useEffect(() => {
+    setTiers(new Set(initialTier ? [initialTier] : []));
+  }, [initialTier]);
   const [branchId, setBranchId] = useState("");
   const [repId, setRepId] = useState("");
   const [stage, setStage] = useState("");
